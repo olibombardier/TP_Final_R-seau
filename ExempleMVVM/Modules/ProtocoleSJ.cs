@@ -23,6 +23,16 @@
         #region Public Methods
 
         /// <summary>
+        /// Représente le chat global
+        /// </summary>
+        public static Conversation conversationGlobal;
+
+        /// <summary>
+        /// Port utilisé pour le chat global
+        /// </summary>
+        public const int port = 50000;
+
+        /// <summary>
         /// Permet de vérifier si le nom d'utilisateur d'un profil est déjà utilisé sur le réseau et
         /// de démarre l'écoute sur le port 50000 UDP pour répondre au demande des autres
         /// utilisateurs. Durant le processus de connexion, profil.ConnexionEnCours est égal à vrai.
@@ -32,7 +42,9 @@
         /// <param name="profil">Profil utilisé dans l'application pour avoir l'état de l'application</param>
         public static async void Connexion(Profil profil)
         {
-            throw new NotImplementedException();
+            conversationGlobal.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            conversationGlobal.Socket.EnableBroadcast = true;
+            conversationGlobal.Socket.Bind(new IPEndPoint(IPAddress.Any, port));
         }
 
         /// <summary>
@@ -80,6 +92,21 @@
         public static void TerminerConversationPrivee(Conversation conversation)
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Envois un message en UDP
+        /// </summary>
+        /// <param name="ipDestinataire"></param>
+        /// <param name="message"></param>
+        public static async void Envoyer(string ipDestinataire, string message)
+        {
+            byte[] data = Encoding.Unicode.GetBytes("TPR" + message);
+
+            await Task.Factory.StartNew(() =>
+            {
+                conversationGlobal.Socket.Send(data);
+            });
         }
 
         #endregion Public Methods
