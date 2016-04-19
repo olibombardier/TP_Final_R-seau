@@ -1,0 +1,35 @@
+﻿<Application x:Class="ExempleMVVM.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:ExempleMVVM"
+             xmlns:vm="clr-namespace:ExempleMVVM.VueModeles"
+             xmlns:vues="clr-namespace:ExempleMVVM.Vues"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Fait le lien entre vmConnexion et vueConnexion -->
+            <DataTemplate DataType="{x:Type vm:vmConnexion}">
+                <vues:vueConnexion />
+            </DataTemplate>
+            <!-- Fait le lien entre vmChat et vueChat -->
+            <DataTemplate DataType="{x:Type vm:vmChat}">
+                <vues:vueChat />
+            </DataTemplate>
+            <!-- Fait le lien entre vmConnexionEnCours et vueConnexionEnCours -->
+            <DataTemplate DataType="{x:Type vm:vmConnexionEnCours}">
+                <vues:vueConnexionEnCours />
+            </DataTemplate>
+            <!-- Définit en template lorsque le Textbox contient une valeur invalide -->
+            <ControlTemplate x:Key="validationTemplate">
+                <StackPanel Orientation="Horizontal">
+                    <Border BorderBrush="Red" BorderThickness="2">
+                        <AdornedElementPlaceholder Margin="1" />
+                    </Border>
+                    <Grid ToolTip="{Binding Path=/ErrorContent}" Background="Red" Width="{Binding Path=ActualHeight, RelativeSource={RelativeSource Self}}" Margin="2">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White">!</TextBlock>
+                    </Grid>
+                </StackPanel>
+            </ControlTemplate>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
