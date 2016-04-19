@@ -25,7 +25,12 @@
         /// <summary>
         /// Représente le chat global
         /// </summary>
-        public static Conversation conversationGlobal;
+        public static Conversation conversationGlobale;
+
+        /// <summary>
+        /// Profil utilisé par l'application
+        /// </summary>
+        public static Profil profilApplication;
 
         /// <summary>
         /// Port utilisé pour le chat global
@@ -42,9 +47,25 @@
         /// <param name="profil">Profil utilisé dans l'application pour avoir l'état de l'application</param>
         public static async void Connexion(Profil profil)
         {
-            conversationGlobal.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            conversationGlobal.Socket.EnableBroadcast = true;
-            conversationGlobal.Socket.Bind(new IPEndPoint(IPAddress.Any, port));
+            profilApplication = profil;
+            profil.ConnexionEnCours = true;
+
+            conversationGlobale = profil.Conversations.Where(c => c.EstGlobale).First();
+            conversationGlobale.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            conversationGlobale.Socket.EnableBroadcast = true;
+            conversationGlobale.Socket.Bind(new IPEndPoint(IPAddress.Any, port));
+
+            Recevoir();
+            EnvoyerDiscovery();
+
+            await Task.Delay(5000);
+
+            if (!profil.UtilisateursConnectes.Any(u => u.Nom == profil.UtilisateurLocal.Nom))
+            {
+                profil.Connecte = true;
+            }
+
+            profil.ConnexionEnCours = false;
         }
 
         /// <summary>
@@ -73,7 +94,7 @@
         /// <param name="messageAEnvoyer">Message à envoyer à tous les utilisateurs</param>
         public static void EnvoyerMessage(Conversation conversationEnCours, string messageAEnvoyer)
         {
-            throw new NotImplementedException();
+            Envoyer(conversationEnCours, "M" + messageAEnvoyer);
         }
 
         /// <summary>
@@ -95,19 +116,46 @@
         }
 
         /// <summary>
-        /// Envois un message en UDP
+        /// Permet de recevoir l'adresse IP ainsi que le Nom de l'utilisateur.
+        /// </summary>
+        public static void Recevoir()
+        {
+        }
+
+        #region Envois
+
+        /// <summary>
+        /// Envois un message en UDP ou TCP selon la conversation et l'encrypte
+        /// si nécessaire
         /// </summary>
         /// <param name="ipDestinataire"></param>
-        /// <param name="message"></param>
-        public static async void Envoyer(string ipDestinataire, string message)
+        /// <param name="conversation">Conversation à laquelle envoyer le message</param>
+        /// <param name="message">Message à envoyer</param>
+        public static async void Envoyer(Conversation conversation, string message)
         {
-            byte[] data = Encoding.Unicode.GetBytes("TPR" + message);
-
-            await Task.Factory.StartNew(() =>
+            if (conversation.EstGlobale)
             {
-                conversationGlobal.Socket.Send(data);
-            });
+                byte[] data = Encoding.Unicode.GetBytes("TPR" + message);
+                await Task.Factory.StartNew(() =>
+                {
+                    conversation.Socket.SendTo(data, new IPEndPoint(IPAddress.Broadcast, port));
+                });
+            }
+            else // Conversation privée
+            {
+                throw new NotImplementedException("La fonction d'envois pour un message privé n'a pas encore étée implémentée");
+            }
         }
+
+        /// <summary>
+        /// Envois un message de discovery en broadcast
+        /// </summary>
+        public static async void EnvoyerDiscovery()
+        {
+            Envoyer(conversationGlobale,"D");
+        }
+
+        #endregion Envois
 
         #endregion Public Methods
     }
