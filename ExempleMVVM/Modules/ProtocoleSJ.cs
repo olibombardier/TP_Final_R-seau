@@ -82,6 +82,14 @@
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Permet de recevoir l'adresse IP ainsi que le Nom de l'utilisateur.
+        /// </summary>
+        public static void Recevoir()
+        {
+
+        }
+
         #endregion Public Methods
     }
 }

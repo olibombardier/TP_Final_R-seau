@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\Olivier\Documents\Programmes\TPFinalReseau\ExempleMVVM\obj\Debug\
+C:\Users\Francis\Desktop\Réseaux 1\TP_Final\ExempleMVVM\obj\Debug\
 ExempleMVVM
 none
 false
 DEBUG;TRACE
-C:\Users\Olivier\Documents\Programmes\TPFinalReseau\ExempleMVVM\App.xaml
+C:\Users\Francis\Desktop\Réseaux 1\TP_Final\ExempleMVVM\App.xaml
 5758536360
 
-25-1516320396
+251303066222
 13-1142990016
 MainWindow.xaml;Vues\AutoScrollingListView.xaml;Vues\vueChat.xaml;Vues\vueConnexion.xaml;Vues\vueConnexionEnCours.xaml;
 
-False
+True
 
