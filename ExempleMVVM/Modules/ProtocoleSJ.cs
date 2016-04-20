@@ -150,7 +150,7 @@
                 {
                     conversation.Socket.Send(data);
                 });
-            }
+            });
         }
 
         public static byte[] Encrypter(string message, byte[] cle)
