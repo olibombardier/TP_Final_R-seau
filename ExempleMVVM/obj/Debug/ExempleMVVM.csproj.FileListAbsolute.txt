@@ -98,3 +98,13 @@ C:\Users\Francis\Desktop\Réseaux 1\TP_Final\ExempleMVVM\bin\Debug\ExempleMVVM.e
 C:\Users\Francis\Desktop\Réseaux 1\TP_Final\ExempleMVVM\bin\Debug\ExempleMVVM.XML
 C:\Users\Francis\Desktop\Réseaux 1\TP_Final\ExempleMVVM\obj\Debug\ExempleMVVM.exe
 C:\Users\Francis\Desktop\Réseaux 1\TP_Final\ExempleMVVM\obj\Debug\ExempleMVVM.pdb
+C:\Users\Francis\Desktop\Réseaux 1\TP_Final\ExempleMVVM\obj\Debug\ExempleMVVM.csprojResolveAssemblyReference.cache
+C:\Users\Francis\Desktop\Réseaux 1\TP_Final\ExempleMVVM\obj\Debug\MainWindow.g.cs
+C:\Users\Francis\Desktop\Réseaux 1\TP_Final\ExempleMVVM\obj\Debug\Vues\AutoScrollingListView.g.cs
+C:\Users\Francis\Desktop\Réseaux 1\TP_Final\ExempleMVVM\obj\Debug\Vues\vueChat.g.cs
+C:\Users\Francis\Desktop\Réseaux 1\TP_Final\ExempleMVVM\obj\Debug\Vues\vueConnexion.g.cs
+C:\Users\Francis\Desktop\Réseaux 1\TP_Final\ExempleMVVM\obj\Debug\Vues\vueConnexionEnCours.g.cs
+C:\Users\Francis\Desktop\Réseaux 1\TP_Final\ExempleMVVM\obj\Debug\App.g.cs
+C:\Users\Francis\Desktop\Réseaux 1\TP_Final\ExempleMVVM\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Users\Francis\Desktop\Réseaux 1\TP_Final\ExempleMVVM\obj\Debug\ExempleMVVM_MarkupCompile.cache
+C:\Users\Francis\Desktop\Réseaux 1\TP_Final\ExempleMVVM\obj\Debug\ExempleMVVM_MarkupCompile.lref

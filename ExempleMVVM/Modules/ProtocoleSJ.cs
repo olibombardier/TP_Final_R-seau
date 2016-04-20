@@ -28,6 +28,11 @@
         public static Conversation conversationGlobale;
 
         /// <summary>
+        /// Profil utilisé par l'application
+        /// </summary>
+        public static Profil profilApplication;
+
+        /// <summary>
         /// Port utilisé pour le chat global
         /// </summary>
         public const int port = 50000;
@@ -45,6 +50,26 @@
             conversationGlobale.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             conversationGlobale.Socket.EnableBroadcast = true;
             conversationGlobale.Socket.Bind(new IPEndPoint(IPAddress.Any, port));
+
+            profilApplication = profil;
+            profil.ConnexionEnCours = true;
+
+            conversationGlobale = profil.Conversations.Where(c => c.EstGlobale).First();
+            conversationGlobale.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            conversationGlobale.Socket.EnableBroadcast = true;
+            conversationGlobale.Socket.Bind(new IPEndPoint(IPAddress.Any, port));
+
+            Recevoir(conversationGlobale);
+            EnvoyerDiscovery();
+
+            await Task.Delay(5000);
+
+            if (!profil.UtilisateursConnectes.Any(u => u.Nom == profil.UtilisateurLocal.Nom))
+            {
+                profil.Connecte = true;
+            }
+
+            profil.ConnexionEnCours = false;
         }
         
         /// <summary>
@@ -73,7 +98,7 @@
         /// <param name="messageAEnvoyer">Message à envoyer à tous les utilisateurs</param>
         public static void EnvoyerMessage(Conversation conversationEnCours, string messageAEnvoyer)
         {
-            throw new NotImplementedException();
+            Envoyer(conversationEnCours, "M" + messageAEnvoyer);
         }
 
         /// <summary>
@@ -97,6 +122,7 @@
 
         #region reception
 
+
         /// <summary>
         /// Permet de recevoir l'adresse IP ainsi que le Nom de l'utilisateur.
         /// </summary>
@@ -119,21 +145,72 @@
 
         #endregion reception
 
-        /// Envois un message en UDP
+        #region Envois
+
         /// <summary>
-        /// <param name="ipDestinataire"></param>
-        /// <param name="message"></param>
+        /// Envois un message en UDP ou TCP selon la conversation et l'encrypte
+        /// si nécessaire
         /// </summary>
-        public static async void Envoyer(string ipDestinataire, string message)
+        /// <param name="ipDestinataire"></param>
+        /// <param name="conversation">Conversation à laquelle envoyer le message</param>
+        /// <param name="message">Message à envoyer</param>
+        public static async void Envoyer(Conversation conversation, string message)
         {
-            byte[] data = Encoding.Unicode.GetBytes("TPR" + message);
+            string messageComplet = "TPR" + message;
 
-            await Task.Factory.StartNew(() =>
+            if (conversation.EstGlobale)
             {
-                conversationGlobale.Socket.Send(data);
-            });
-
+                byte[] data = Encoding.Unicode.GetBytes(messageComplet);
+                await Task.Factory.StartNew(() =>
+                {
+                    conversation.Socket.SendTo(data, new IPEndPoint(IPAddress.Broadcast, port));
+                });
+            }
+            else // Conversation privée
+            {
+                byte[] data = Encrypter(messageComplet, conversation.Key);
+                await Task.Factory.StartNew(() =>
+                {
+                    conversation.Socket.Send(data);
+                });
+            }
         }
+
+        public static byte[] Encrypter(string message, byte[] cle)
+        {
+            byte[] resultat = new byte[1024];
+            Aes aes = Aes.Create();
+
+            if (cle.Length != 128)
+            {
+                throw new ArgumentException("La clé doit être de 128 bits");
+            }
+
+            aes.Key = cle;
+
+            ICryptoTransform encrypteur = aes.CreateEncryptor();
+            using (MemoryStream memoryStream = new MemoryStream(resultat))
+            {
+                using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encrypteur, CryptoStreamMode.Write))
+                {
+                    using (StreamWriter writer = new StreamWriter(cryptoStream))
+                    {
+                        writer.Write(message);
+                    }
+                }
+            }
+            return resultat;
+        }
+
+        /// <summary>
+        /// Envois un message de discovery en broadcast
+        /// </summary>
+        public static async void EnvoyerDiscovery()
+        {
+            Envoyer(conversationGlobale,"D");
+        }
+
+        #endregion Envois
 
         #endregion Public Methods
     }

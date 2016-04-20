@@ -232,6 +232,21 @@
             utilisant le TCP (port aléatoire).
             </summary>
         </member>
+        <member name="F:ExempleMVVM.Modules.ProtocoleSJ.port">
+            <summary>
+            Port utilisé pour le chat global
+            </summary>
+        </member>
+        <member name="F:ExempleMVVM.Modules.ProtocoleSJ.conversationGlobale">
+            <summary>
+            Représente le chat global
+            </summary>
+        </member>
+        <member name="F:ExempleMVVM.Modules.ProtocoleSJ.profilApplication">
+            <summary>
+            Profil utilisé par l'application
+            </summary>
+        </member>
         <member name="M:ExempleMVVM.Modules.ProtocoleSJ.Connexion(ExempleMVVM.Modeles.Profil)">
             <summary>
             Permet de vérifier si le nom d'utilisateur d'un profil est déjà utilisé sur le réseau et
@@ -273,6 +288,25 @@
             Permet de fermer correctement une conversation privée
             </summary>
             <param name="conversation">Conversation à fermer</param>
+        </member>
+        <member name="M:ExempleMVVM.Modules.ProtocoleSJ.Recevoir">
+            <summary>
+            Permet de recevoir l'adresse IP ainsi que le Nom de l'utilisateur.
+            </summary>
+        </member>
+        <member name="M:ExempleMVVM.Modules.ProtocoleSJ.Envoyer(ExempleMVVM.Modeles.Conversation,System.String)">
+            <summary>
+            Envois un message en UDP ou TCP selon la conversation et l'encrypte
+            si nécessaire
+            </summary>
+            <param name="ipDestinataire"></param>
+            <param name="conversation">Conversation à laquelle envoyer le message</param>
+            <param name="message">Message à envoyer</param>
+        </member>
+        <member name="M:ExempleMVVM.Modules.ProtocoleSJ.EnvoyerDiscovery">
+            <summary>
+            Envois un message de discovery en broadcast
+            </summary>
         </member>
         <member name="T:ExempleMVVM.VueModeles.RelayCommand`1">
             <summary>
