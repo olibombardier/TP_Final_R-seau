@@ -25,7 +25,7 @@
         /// <summary>
         /// Représente le chat global
         /// </summary>
-        public static Conversation conversationGlobal;
+        public static Conversation conversationGlobale;
 
         /// <summary>
         /// Port utilisé pour le chat global
@@ -42,11 +42,11 @@
         /// <param name="profil">Profil utilisé dans l'application pour avoir l'état de l'application</param>
         public static async void Connexion(Profil profil)
         {
-            conversationGlobal.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            conversationGlobal.Socket.EnableBroadcast = true;
-            conversationGlobal.Socket.Bind(new IPEndPoint(IPAddress.Any, port));
+            conversationGlobale.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            conversationGlobale.Socket.EnableBroadcast = true;
+            conversationGlobale.Socket.Bind(new IPEndPoint(IPAddress.Any, port));
         }
-
+        
         /// <summary>
         /// Méthode permettant de fermer toutes les connexions en cours (UDP et TCP)
         /// </summary>
@@ -94,24 +94,43 @@
             throw new NotImplementedException();
         }
 
-        /// <summary>
 
+        #region reception
+
+        /// <summary>
         /// Permet de recevoir l'adresse IP ainsi que le Nom de l'utilisateur.
         /// </summary>
-        public static void Recevoir()
+        public static async void Recevoir(Conversation conversation)
         {
+            bool Connecte = false;
+
+            while (!Connecte)
+            {
+                byte[] data = new byte[1024];
+
+                await Task.Factory.StartNew(() =>
+                {
+                    conversationGlobale.Socket.Receive(data);
+                });
+
+
+            }
         }
+
+        #endregion reception
+
         /// Envois un message en UDP
-        /// </summary>
+        /// <summary>
         /// <param name="ipDestinataire"></param>
         /// <param name="message"></param>
+        /// </summary>
         public static async void Envoyer(string ipDestinataire, string message)
         {
             byte[] data = Encoding.Unicode.GetBytes("TPR" + message);
 
             await Task.Factory.StartNew(() =>
             {
-                conversationGlobal.Socket.Send(data);
+                conversationGlobale.Socket.Send(data);
             });
 
         }
