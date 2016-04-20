@@ -147,6 +147,32 @@
             }
         }
 
+        public static byte[] Encrypter(string message, byte[] cle)
+        {
+            byte[] resultat = new byte[1024];
+            Aes aes = Aes.Create();
+
+            if (cle.Length != 128)
+            {
+                throw new ArgumentException("La clé doit être de 128 bits");
+            }
+
+            aes.Key = cle;
+
+            ICryptoTransform encrypteur = aes.CreateEncryptor();
+            using (MemoryStream memoryStream = new MemoryStream(resultat))
+            {
+                using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encrypteur, CryptoStreamMode.Write))
+                {
+                    using (StreamWriter writer = new StreamWriter(cryptoStream))
+                    {
+                        writer.Write(message);
+                    }
+                }
+            }
+            return resultat;
+        }
+
         /// <summary>
         /// Envois un message de discovery en broadcast
         /// </summary>
