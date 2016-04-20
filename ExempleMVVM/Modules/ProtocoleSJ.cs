@@ -133,9 +133,11 @@
         /// <param name="message">Message à envoyer</param>
         public static async void Envoyer(Conversation conversation, string message)
         {
+            string messageComplet = "TPR" + message;
+
             if (conversation.EstGlobale)
             {
-                byte[] data = Encoding.Unicode.GetBytes("TPR" + message);
+                byte[] data = Encoding.Unicode.GetBytes(messageComplet);
                 await Task.Factory.StartNew(() =>
                 {
                     conversation.Socket.SendTo(data, new IPEndPoint(IPAddress.Broadcast, port));
@@ -143,7 +145,11 @@
             }
             else // Conversation privée
             {
-                throw new NotImplementedException("La fonction d'envois pour un message privé n'a pas encore étée implémentée");
+                byte[] data = Encrypter(messageComplet, conversation.Key);
+                await Task.Factory.StartNew(() =>
+                {
+                    conversation.Socket.Send(data);
+                });
             }
         }
 
