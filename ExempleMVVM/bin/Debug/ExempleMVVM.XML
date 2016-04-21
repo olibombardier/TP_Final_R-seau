@@ -10,22 +10,6 @@
             tous les utilisateurs) ou une conversation privée (avec un utilisateur seulement).
             </summary>
         </member>
-        <member name="T:ExempleMVVM.Modeles.ModelBase">
-            <summary>
-            Classe mère des modèles du système.
-            </summary>
-        </member>
-        <member name="M:ExempleMVVM.Modeles.ModelBase.NotifyPropertyChanged(System.String)">
-            <summary>
-            Méthode permettant d'appeler PropertyChanged sans avoir à spécifier ses paramètres
-            </summary>
-            <param name="nomPropriete">Nom de la propriété qui a changée</param>
-        </member>
-        <member name="E:ExempleMVVM.Modeles.ModelBase.PropertyChanged">
-            <summary>
-            Évènement permettant d'avertir les observateurs du changement d'une propriété
-            </summary>
-        </member>
         <member name="F:ExempleMVVM.Modeles.Conversation.connecte">
             <summary>
             Variable privée de la propriété <see cref="P:ExempleMVVM.Modeles.Conversation.Connecte"/>
@@ -131,6 +115,22 @@
             Obtient ou définit l'utilisateur qui a envoyé le message.
             </summary>
         </member>
+        <member name="T:ExempleMVVM.Modeles.ModelBase">
+            <summary>
+            Classe mère des modèles du système.
+            </summary>
+        </member>
+        <member name="E:ExempleMVVM.Modeles.ModelBase.PropertyChanged">
+            <summary>
+            Évènement permettant d'avertir les observateurs du changement d'une propriété
+            </summary>
+        </member>
+        <member name="M:ExempleMVVM.Modeles.ModelBase.NotifyPropertyChanged(System.String)">
+            <summary>
+            Méthode permettant d'appeler PropertyChanged sans avoir à spécifier ses paramètres
+            </summary>
+            <param name="nomPropriete">Nom de la propriété qui a changée</param>
+        </member>
         <member name="T:ExempleMVVM.Modeles.Profil">
             <summary>
             Profil de l'utilisateur local.
@@ -232,11 +232,6 @@
             utilisant le TCP (port aléatoire).
             </summary>
         </member>
-        <member name="F:ExempleMVVM.Modules.ProtocoleSJ.port">
-            <summary>
-            Port utilisé pour le chat global
-            </summary>
-        </member>
         <member name="F:ExempleMVVM.Modules.ProtocoleSJ.conversationGlobale">
             <summary>
             Représente le chat global
@@ -245,6 +240,11 @@
         <member name="F:ExempleMVVM.Modules.ProtocoleSJ.profilApplication">
             <summary>
             Profil utilisé par l'application
+            </summary>
+        </member>
+        <member name="F:ExempleMVVM.Modules.ProtocoleSJ.port">
+            <summary>
+            Port utilisé pour le chat global
             </summary>
         </member>
         <member name="M:ExempleMVVM.Modules.ProtocoleSJ.Connexion(ExempleMVVM.Modeles.Profil)">
@@ -289,7 +289,7 @@
             </summary>
             <param name="conversation">Conversation à fermer</param>
         </member>
-        <member name="M:ExempleMVVM.Modules.ProtocoleSJ.Recevoir">
+        <member name="M:ExempleMVVM.Modules.ProtocoleSJ.Recevoir(ExempleMVVM.Modeles.Conversation)">
             <summary>
             Permet de recevoir l'adresse IP ainsi que le Nom de l'utilisateur.
             </summary>
@@ -342,6 +342,11 @@
             <param name="execute">La logique d'exécution.</param>
             <param name="canExecute">La logique du statut de l'exécution</param>
         </member>
+        <member name="E:ExempleMVVM.VueModeles.RelayCommand`1.CanExecuteChanged">
+            <summary>
+            Occurs when changes occur that affect whether or not the command should execute.
+            </summary>
+        </member>
         <member name="M:ExempleMVVM.VueModeles.RelayCommand`1.CanExecute(System.Object)">
             <summary>
             Defines the method that determines whether the command can execute in its current state.
@@ -361,11 +366,6 @@
             can be set to <see langword="null"/>.
             </param>
         </member>
-        <member name="E:ExempleMVVM.VueModeles.RelayCommand`1.CanExecuteChanged">
-            <summary>
-            Occurs when changes occur that affect whether or not the command should execute.
-            </summary>
-        </member>
         <member name="T:ExempleMVVM.VueModeles.ViewModelBase">
             <summary>
             Classe mère des vues-modèles du système.
@@ -375,6 +375,21 @@
             <summary>
             Dictionnaire contenant les erreurs de validation. La clé est égal au nom de la propriété
             contenant des erreurs en string. La valeur est égal à une liste de string des erreurs.
+            </summary>
+        </member>
+        <member name="E:ExempleMVVM.VueModeles.ViewModelBase.ErrorsChanged">
+            <summary>
+            Évènement avertissant qu'il y a des erreurs de validation pour une propriété.
+            </summary>
+        </member>
+        <member name="E:ExempleMVVM.VueModeles.ViewModelBase.PropertyChanged">
+            <summary>
+            Évènement permettant d'avertir les observateurs du changement d'une propriété
+            </summary>
+        </member>
+        <member name="P:ExempleMVVM.VueModeles.ViewModelBase.HasErrors">
+            <summary>
+            Obtient une valeur indiquant si la liste ValidationErrors contient des erreurs.
             </summary>
         </member>
         <member name="M:ExempleMVVM.VueModeles.ViewModelBase.GetErrors(System.String)">
@@ -395,21 +410,6 @@
             Méthode permettant d'appeler PropertyChanged sans avoir à spécifier ses paramètres
             </summary>
             <param name="nomPropriete">Nom de la propriété qui a changée</param>
-        </member>
-        <member name="E:ExempleMVVM.VueModeles.ViewModelBase.ErrorsChanged">
-            <summary>
-            Évènement avertissant qu'il y a des erreurs de validation pour une propriété.
-            </summary>
-        </member>
-        <member name="E:ExempleMVVM.VueModeles.ViewModelBase.PropertyChanged">
-            <summary>
-            Évènement permettant d'avertir les observateurs du changement d'une propriété
-            </summary>
-        </member>
-        <member name="P:ExempleMVVM.VueModeles.ViewModelBase.HasErrors">
-            <summary>
-            Obtient une valeur indiquant si la liste ValidationErrors contient des erreurs.
-            </summary>
         </member>
         <member name="T:ExempleMVVM.VueModeles.vmChat">
             <summary>
@@ -456,13 +456,6 @@
             avoir l'état de l'application
             </param>
         </member>
-        <member name="M:ExempleMVVM.VueModeles.vmChat.Profil_PropertyChanged(System.Object,System.ComponentModel.PropertyChangedEventArgs)">
-            <summary>
-            Permet de démarrer le processus de récupération des utilisateurs
-            </summary>
-            <param name="sender">Celui qui a appelé l'évènement</param>
-            <param name="e">Contient le nom de la propriété qui a changée</param>
-        </member>
         <member name="P:ExempleMVVM.VueModeles.vmChat.ConversationEnCours">
             <summary>
             Obtient ou définit la conversation présentement sélectionnée, à qui les messages sont envoyés
@@ -501,6 +494,13 @@
             utilisateur dans la liste des utilisateurs connectés.
             </summary>
         </member>
+        <member name="M:ExempleMVVM.VueModeles.vmChat.Profil_PropertyChanged(System.Object,System.ComponentModel.PropertyChangedEventArgs)">
+            <summary>
+            Permet de démarrer le processus de récupération des utilisateurs
+            </summary>
+            <param name="sender">Celui qui a appelé l'évènement</param>
+            <param name="e">Contient le nom de la propriété qui a changée</param>
+        </member>
         <member name="T:ExempleMVVM.VueModeles.vmConnexion">
             <summary>
             Vue-modèle pour la vue vueConnexion
@@ -526,14 +526,6 @@
             avoir l'état de l'application
             </param>
         </member>
-        <member name="M:ExempleMVVM.VueModeles.vmConnexion.Profil_PropertyChanged(System.Object,System.ComponentModel.PropertyChangedEventArgs)">
-            <summary>
-            Permet de vérifier le changement de propriété du profil. Si profil.ConnexionEnCours devient à faux et que profil.Connecte est toujours à faux, c'est qu'il y a eu
-            un problème de connexion. Pour l'instant, le seul problème géré est un nom d'utilisateur déjà utilisé.
-            </summary>
-            <param name="sender">Envoyeur de l'évènement</param>
-            <param name="e">Contient le nom de la propriété qui a changée</param>
-        </member>
         <member name="P:ExempleMVVM.VueModeles.vmConnexion.ConnecterUtilisateur">
             <summary>
             Obtient la commande permettant de connecter l'utilisateur à l'application. Théoriquement,
@@ -545,6 +537,14 @@
             <summary>
             Obtient ou définit le nom de l'utilisateur local pour se connecter
             </summary>
+        </member>
+        <member name="M:ExempleMVVM.VueModeles.vmConnexion.Profil_PropertyChanged(System.Object,System.ComponentModel.PropertyChangedEventArgs)">
+            <summary>
+            Permet de vérifier le changement de propriété du profil. Si profil.ConnexionEnCours devient à faux et que profil.Connecte est toujours à faux, c'est qu'il y a eu
+            un problème de connexion. Pour l'instant, le seul problème géré est un nom d'utilisateur déjà utilisé.
+            </summary>
+            <param name="sender">Envoyeur de l'évènement</param>
+            <param name="e">Contient le nom de la propriété qui a changée</param>
         </member>
         <member name="T:ExempleMVVM.VueModeles.vmConnexionEnCours">
             <summary>
@@ -594,13 +594,6 @@
             vues-modèles de l'application et spécifie le premier vue-modèle à afficher
             </summary>
         </member>
-        <member name="M:ExempleMVVM.VueModeles.vmMainWindow.Profil_PropertyChanged(System.Object,System.ComponentModel.PropertyChangedEventArgs)">
-            <summary>
-            Permet de changer d'interface lorsque l'utilisateur est connecté
-            </summary>
-            <param name="sender">Celui qui a appelé l'évènement</param>
-            <param name="e">Contient le nom de la propriété qui a changée</param>
-        </member>
         <member name="P:ExempleMVVM.VueModeles.vmMainWindow.CurrentViewModel">
             <summary>
             Obtient ou définit le vue-modèle présentement affiché dans la vue principale (les
@@ -616,6 +609,13 @@
             <summary>
             Obtient le titre de l'application pour y mettre le nom de l'utilisateur
             </summary>
+        </member>
+        <member name="M:ExempleMVVM.VueModeles.vmMainWindow.Profil_PropertyChanged(System.Object,System.ComponentModel.PropertyChangedEventArgs)">
+            <summary>
+            Permet de changer d'interface lorsque l'utilisateur est connecté
+            </summary>
+            <param name="sender">Celui qui a appelé l'évènement</param>
+            <param name="e">Contient le nom de la propriété qui a changée</param>
         </member>
         <member name="T:ExempleMVVM.Vues.AutoScrollingListView">
             <summary>

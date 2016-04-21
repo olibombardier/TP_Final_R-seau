@@ -47,17 +47,21 @@
         /// <param name="profil">Profil utilisé dans l'application pour avoir l'état de l'application</param>
         public static async void Connexion(Profil profil)
         {
+            conversationGlobale = profil.Conversations.Where(c => c.EstGlobale).First();
+            //Si la converstion globale n'existe pas, elle est crée
+            if (conversationGlobale == null)
+            {
+                conversationGlobale = new Conversation();
+                conversationGlobale.EstGlobale = true;
+
+                profil.Conversations.Add(conversationGlobale);
+            }
             conversationGlobale.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             conversationGlobale.Socket.EnableBroadcast = true;
             conversationGlobale.Socket.Bind(new IPEndPoint(IPAddress.Any, port));
 
             profilApplication = profil;
             profil.ConnexionEnCours = true;
-
-            conversationGlobale = profil.Conversations.Where(c => c.EstGlobale).First();
-            conversationGlobale.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            conversationGlobale.Socket.EnableBroadcast = true;
-            conversationGlobale.Socket.Bind(new IPEndPoint(IPAddress.Any, port));
 
             Recevoir(conversationGlobale);
             EnvoyerDiscovery();
@@ -107,7 +111,7 @@
         /// </summary>
         public static async void RafraichirListeUtilisateursConnectes()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         /// <summary>
@@ -134,12 +138,35 @@
             {
                 byte[] data = new byte[1024];
 
+                int byteRead = 0;
+
                 await Task.Factory.StartNew(() =>
                 {
-                    conversationGlobale.Socket.Receive(data);
+                   byteRead = conversationGlobale.Socket.Receive(data);
                 });
+                string message = Encoding.Unicode.GetString(data ,0 ,byteRead);
 
-
+                if(message.Substring(0, 3) == "TPR")
+                {
+                    switch (message[3])
+                    {
+                        case 'D':
+                            Console.WriteLine("Discovery");
+                            break;
+                        case 'I':
+                            Console.WriteLine("Identification");
+                            break;
+                        case 'M':
+                            Console.WriteLine("Message");
+                            break;
+                        case 'P':
+                            Console.WriteLine("Privé");
+                            break;
+                        case 'Q':
+                            Console.WriteLine("Quitter");
+                            break;
+                    }
+                }
             }
         }
 
