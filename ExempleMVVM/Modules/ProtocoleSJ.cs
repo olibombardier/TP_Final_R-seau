@@ -48,7 +48,9 @@
         public static async void Connexion(Profil profil)
         {
             conversationGlobale = profil.Conversations.Where(c => c.EstGlobale).First();
+
             //Si la converstion globale n'existe pas, elle est crée
+
             if (conversationGlobale == null)
             {
                 conversationGlobale = new Conversation();
@@ -56,6 +58,7 @@
 
                 profil.Conversations.Add(conversationGlobale);
             }
+
             conversationGlobale.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             conversationGlobale.Socket.EnableBroadcast = true;
             conversationGlobale.Socket.Bind(new IPEndPoint(IPAddress.Any, port));
@@ -81,7 +84,17 @@
         /// </summary>
         public static void Deconnexion()
         {
-            throw new NotImplementedException();
+            foreach (Conversation c in profilApplication.Conversations)
+            {
+                if (c.EstPrivee)
+                {
+                    TerminerConversationPrivee(c);
+                }
+                else
+                {
+                    c.Socket.Close();
+                }
+            }
         }
 
         /// <summary>
@@ -235,6 +248,15 @@
         public static async void EnvoyerDiscovery()
         {
             Envoyer(conversationGlobale,"D");
+        }
+
+        /// <summary>
+        /// Envois le nom de l'utilisateur à la conversation fournie
+        /// </summary>
+        /// <param name="conversation"></param>
+        public static async void EnvoyerIdentification(Conversation conversation)
+        {
+            Envoyer(conversation, "I" + profilApplication.Nom);
         }
 
         #endregion Envois
