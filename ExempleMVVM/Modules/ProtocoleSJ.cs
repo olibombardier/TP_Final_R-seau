@@ -226,6 +226,15 @@
             Envoyer(conversationGlobale,"D");
         }
 
+        /// <summary>
+        /// Envois le nom de l'utilisateur à la conversation fournie
+        /// </summary>
+        /// <param name="conversation"></param>
+        public static async void EnvoyerIdentification(Conversation conversation)
+        {
+            Envoyer(conversation, "I" + profilApplication.Nom);
+        }
+
         #endregion Envois
 
         #endregion Public Methods
