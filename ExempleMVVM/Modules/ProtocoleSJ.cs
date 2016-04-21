@@ -47,17 +47,23 @@
         /// <param name="profil">Profil utilisé dans l'application pour avoir l'état de l'application</param>
         public static async void Connexion(Profil profil)
         {
+            conversationGlobale = profil.Conversations.Where(c => c.EstGlobale).First();
+
+            //Si la conversation globale n'existe pas, elle est créée
+            if (conversationGlobale == null)
+            {
+                conversationGlobale = new Conversation();
+                conversationGlobale.EstGlobale = true;
+
+                profil.Conversations.Add(conversationGlobale);
+            }
+
             conversationGlobale.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             conversationGlobale.Socket.EnableBroadcast = true;
             conversationGlobale.Socket.Bind(new IPEndPoint(IPAddress.Any, port));
 
             profilApplication = profil;
             profil.ConnexionEnCours = true;
-
-            conversationGlobale = profil.Conversations.Where(c => c.EstGlobale).First();
-            conversationGlobale.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            conversationGlobale.Socket.EnableBroadcast = true;
-            conversationGlobale.Socket.Bind(new IPEndPoint(IPAddress.Any, port));
 
             Recevoir(conversationGlobale);
             EnvoyerDiscovery();
@@ -77,7 +83,17 @@
         /// </summary>
         public static void Deconnexion()
         {
-            throw new NotImplementedException();
+            foreach (Conversation c in profilApplication.Conversations)
+            {
+                if (c.EstPrivee)
+                {
+                    TerminerConversationPrivee(c);
+                }
+                else
+                {
+                    c.Socket.Close();
+                }
+            }
         }
 
         /// <summary>
@@ -107,7 +123,7 @@
         /// </summary>
         public static async void RafraichirListeUtilisateursConnectes()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         /// <summary>

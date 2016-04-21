@@ -289,7 +289,7 @@
             </summary>
             <param name="conversation">Conversation à fermer</param>
         </member>
-        <member name="M:ExempleMVVM.Modules.ProtocoleSJ.Recevoir">
+        <member name="M:ExempleMVVM.Modules.ProtocoleSJ.Recevoir(ExempleMVVM.Modeles.Conversation)">
             <summary>
             Permet de recevoir l'adresse IP ainsi que le Nom de l'utilisateur.
             </summary>
