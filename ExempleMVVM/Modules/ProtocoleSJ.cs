@@ -235,6 +235,15 @@
             Envoyer(conversation, "I" + profilApplication.Nom);
         }
 
+        /// <summary>
+        /// Indique à l'autre utilisateur qu'on a
+        /// </summary>
+        /// <param name="nouvelleConversation"></param>
+        public static async void EnvoyerDemendeConversationPrivee(Conversation conversation)
+        {
+
+        }
+
         #endregion Envois
 
         #endregion Public Methods
