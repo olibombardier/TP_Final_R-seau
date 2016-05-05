@@ -49,7 +49,8 @@
         {
             conversationGlobale = profil.Conversations.Where(c => c.EstGlobale).First();
 
-            //Si la conversation globale n'existe pas, elle est créée
+            //Si la converstion globale n'existe pas, elle est crée
+
             if (conversationGlobale == null)
             {
                 conversationGlobale = new Conversation();
@@ -150,12 +151,35 @@
             {
                 byte[] data = new byte[1024];
 
+                int byteRead = 0;
+
                 await Task.Factory.StartNew(() =>
                 {
-                    conversationGlobale.Socket.Receive(data);
+                   byteRead = conversationGlobale.Socket.Receive(data);
                 });
+                string message = Encoding.Unicode.GetString(data ,0 ,byteRead);
 
-
+                if(message.Substring(0, 3) == "TPR")
+                {
+                    switch (message[3])
+                    {
+                        case 'D':
+                            Console.WriteLine("Discovery");
+                            break;
+                        case 'I':
+                            Console.WriteLine("Identification");
+                            break;
+                        case 'M':
+                            Console.WriteLine("Message");
+                            break;
+                        case 'P':
+                            Console.WriteLine("Privé");
+                            break;
+                        case 'Q':
+                            Console.WriteLine("Quitter");
+                            break;
+                    }
+                }
             }
         }
 
