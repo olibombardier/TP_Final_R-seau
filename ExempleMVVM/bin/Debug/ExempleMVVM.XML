@@ -294,6 +294,18 @@
             Permet de recevoir l'adresse IP ainsi que le Nom de l'utilisateur.
             </summary>
         </member>
+        <member name="M:ExempleMVVM.Modules.ProtocoleSJ.RecevoirIdentification(System.Net.IPEndPoint,System.String)">
+            <summary>
+            Reçois l'idetification d'un utilisateur
+            </summary>
+            <param name="endpoint"></param>
+        </member>
+        <member name="M:ExempleMVVM.Modules.ProtocoleSJ.EstMonAdresse(System.Net.IPAddress)">
+            <summary>
+            Retourne vrai si l'adresse passée en argument est la notre
+            </summary>
+            <param name="adresse">Adresse à vérifier</param>
+        </member>
         <member name="M:ExempleMVVM.Modules.ProtocoleSJ.Envoyer(ExempleMVVM.Modeles.Conversation,System.String)">
             <summary>
             Envois un message en UDP ou TCP selon la conversation et l'encrypte
