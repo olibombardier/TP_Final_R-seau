@@ -138,7 +138,13 @@
 
 
         #region reception
-
+        /// <summary>
+        /// Permet de recevoir un message en mode global
+        /// </summary>
+        public static void RecevoirMessage()
+        {
+            
+        }
 
         /// <summary>
         /// Permet de recevoir l'adresse IP ainsi que le Nom de l'utilisateur.
@@ -164,19 +170,19 @@
                     switch (message[3])
                     {
                         case 'D':
-                            Console.WriteLine("Discovery");
+                            EnvoyerIdentification(conversation);
                             break;
                         case 'I':
-                            Console.WriteLine("Identification");
+                            System.Diagnostics.Debug.WriteLine("Identification");
                             break;
                         case 'M':
-                            Console.WriteLine("Message");
+                            System.Diagnostics.Debug.WriteLine("Message");
                             break;
                         case 'P':
-                            Console.WriteLine("Privé");
+                            System.Diagnostics.Debug.WriteLine("Privé");
                             break;
                         case 'Q':
-                            Console.WriteLine("Quitter");
+                            System.Diagnostics.Debug.WriteLine("Quitter");
                             break;
                     }
                 }

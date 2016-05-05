@@ -289,6 +289,11 @@
             </summary>
             <param name="conversation">Conversation à fermer</param>
         </member>
+        <member name="M:ExempleMVVM.Modules.ProtocoleSJ.RecevoirMessage">
+            <summary>
+            Permet de recevoir un message en mode global
+            </summary>
+        </member>
         <member name="M:ExempleMVVM.Modules.ProtocoleSJ.Recevoir(ExempleMVVM.Modeles.Conversation)">
             <summary>
             Permet de recevoir l'adresse IP ainsi que le Nom de l'utilisateur.
@@ -307,6 +312,12 @@
             <summary>
             Envois un message de discovery en broadcast
             </summary>
+        </member>
+        <member name="M:ExempleMVVM.Modules.ProtocoleSJ.EnvoyerIdentification(ExempleMVVM.Modeles.Conversation)">
+            <summary>
+            Envois le nom de l'utilisateur à la conversation fournie
+            </summary>
+            <param name="conversation"></param>
         </member>
         <member name="T:ExempleMVVM.VueModeles.RelayCommand`1">
             <summary>
