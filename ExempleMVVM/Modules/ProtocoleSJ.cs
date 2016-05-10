@@ -145,7 +145,7 @@
         /// </summary>
         public static async void Recevoir(Conversation conversation)
         {
-            bool Connecte = false;
+            bool Connecte = false; 
 
             while (!Connecte)
             {

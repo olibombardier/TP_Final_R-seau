@@ -1,9 +1,3 @@
-*.suo
-bin/*
-obj/*
-*.log
-
-bin/
-obj/
-*.exe
+*
+!ExempleMVVM/Modules/ProtocoleSJ.cs
 
