@@ -152,17 +152,25 @@ namespace ExempleMVVM.Modules
         /// </summary>
         public static async void Recevoir(Conversation conversation)
         {
-            bool Connecte = false;
+            bool Connecte = false; 
 
             while (!Connecte)
             {
                 byte[] data = new byte[1024];
 
                 int byteRead = 0;
+                EndPoint otherEndPoint = new IPEndPoint(IPAddress.Any, 0);
 
                 await Task.Factory.StartNew(() =>
                 {
-                   byteRead = conversationGlobale.Socket.Receive(data);
+                    if (conversation.EstPrivee)
+                    {
+                        byteRead = conversation.Socket.Receive(data);
+                    }
+                    else
+                    {
+                        byteRead = conversation.Socket.ReceiveFrom(data, ref otherEndPoint);
+                    }
                 });
                 string message = Encoding.Unicode.GetString(data ,0 ,byteRead);
 
@@ -174,7 +182,10 @@ namespace ExempleMVVM.Modules
                             EnvoyerIdentification(conversation);
                             break;
                         case 'I':
-                            System.Diagnostics.Debug.WriteLine("Identification");
+                            if (conversation.EstGlobale)
+                            {
+                                RecevoirIdentification((IPEndPoint)otherEndPoint, message);
+                            }
                             break;
                         case 'M':
                             System.Diagnostics.Debug.WriteLine("Message");
@@ -188,6 +199,38 @@ namespace ExempleMVVM.Modules
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Reçois l'idetification d'un utilisateur
+        /// </summary>
+        /// <param name="endpoint"></param>
+        public static void RecevoirIdentification(IPEndPoint endpoint, string message)
+        {
+            string nom = message.Substring(4);
+            IPAddress adresse = endpoint.Address;
+
+            if (!(profilApplication.UtilisateursConnectes.Any(u => u.IP == adresse.ToString()) ||
+                EstMonAdresse(adresse)))
+            {
+                profilApplication.UtilisateursConnectes.Add(new Utilisateur()
+                {
+                    Nom = nom,
+                    IP = adresse.ToString()
+                });
+            }
+        }
+
+        /// <summary>
+        /// Retourne vrai si l'adresse passée en argument est la notre
+        /// </summary>
+        /// <param name="adresse">Adresse à vérifier</param>
+        public static bool EstMonAdresse(IPAddress adresse)
+        {
+            IPHostEntry hostEntry = Dns.GetHostEntry(Dns.GetHostName());
+            IPAddress[] listeAdresse = hostEntry.AddressList;
+
+            return listeAdresse.Any(a => a.Equals(adresse));
         }
 
         #endregion reception
@@ -264,6 +307,15 @@ namespace ExempleMVVM.Modules
         public static async void EnvoyerIdentification(Conversation conversation)
         {
             Envoyer(conversation, "I" + profilApplication.Nom);
+        }
+
+        /// <summary>
+        /// Indique à l'autre utilisateur qu'on a
+        /// </summary>
+        /// <param name="nouvelleConversation"></param>
+        public static async void EnvoyerDemendeConversationPrivee(Conversation conversation)
+        {
+
         }
 
         #endregion Envois
