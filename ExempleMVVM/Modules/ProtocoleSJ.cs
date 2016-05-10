@@ -192,7 +192,11 @@ namespace ExempleMVVM.Modules
 
             if (profilApplication.UtilisateursConnectes.Count > 0)
             {
-                resultat = profilApplication.UtilisateursConnectes.Where(u => u.IP == ip).First();
+                IEnumerable<Utilisateur> utilisateursTrouve = profilApplication.UtilisateursConnectes.Where(u => u.IP == ip);
+                if (utilisateursTrouve.Count() > 0)
+                {
+                    resultat = utilisateursTrouve.First();
+                }
             }
 
             return resultat;
