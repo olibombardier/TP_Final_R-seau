@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ExempleMVVM.Modeles;
+using System.Net.NetworkInformation;
 
 namespace ExempleMVVM.Modules
 {
@@ -38,6 +39,8 @@ namespace ExempleMVVM.Modules
         /// </summary>
         public const int port = 50000;
 
+        public static List<IPAddress> mesAdresse = new List<IPAddress>();
+
         /// <summary>
         /// Permet de vérifier si le nom d'utilisateur d'un profil est déjà utilisé sur le réseau et
         /// de démarre l'écoute sur le port 50000 UDP pour répondre au demande des autres
@@ -64,6 +67,19 @@ namespace ExempleMVVM.Modules
             conversationGlobale.Socket.EnableBroadcast = true;
             conversationGlobale.Socket.Bind(new IPEndPoint(IPAddress.Any, port));
 
+
+            // Trouver nos propre adresse IP
+            foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                foreach (UnicastIPAddressInformation information in ni.GetIPProperties().UnicastAddresses)
+                {
+                    if (information.Address.AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        mesAdresse.Add(information.Address);
+                    }
+                }
+            }
+
             profilApplication = profil;
             profil.ConnexionEnCours = true;
 
@@ -76,8 +92,15 @@ namespace ExempleMVVM.Modules
             {
                 profil.Connecte = true;
             }
+            else
+            {
+                conversationGlobale.Socket.Close();
+            }
 
             profil.ConnexionEnCours = false;
+
+
+            
         }
         
         /// <summary>
@@ -151,14 +174,21 @@ namespace ExempleMVVM.Modules
         }
 
         /// <summary>
-        /// Retourne l'utilisateur à qui apartien l'endpoint
+        /// Retourne l'utilisateur à qui apartient l'endpoint
         /// </summary>
         /// <param name="endPoint">EndPoint</param>
         /// <returns>L'utilisateur, null s'il n'est pas trouvé</returns>
         public static Utilisateur TrouverUtilisateurSelonEndPoint(EndPoint endPoint)
         {
             string ip = ((IPEndPoint) endPoint).Address.ToString();
-            return profilApplication.UtilisateursConnectes.Where(u => u.IP == ip).First();
+            Utilisateur resultat = null;
+
+            if (profilApplication.UtilisateursConnectes.Count > 0)
+            {
+                resultat = profilApplication.UtilisateursConnectes.Where(u => u.IP == ip).First();
+            }
+
+            return resultat;
         }
 
         /// <summary>
@@ -241,10 +271,7 @@ namespace ExempleMVVM.Modules
         /// <param name="adresse">Adresse à vérifier</param>
         public static bool EstMonAdresse(IPAddress adresse)
         {
-            IPHostEntry hostEntry = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress[] listeAdresse = hostEntry.AddressList;
-
-            return listeAdresse.Any(a => a.Equals(adresse));
+            return mesAdresse.Any(a => a.Equals(adresse));
         }
 
         #endregion reception
