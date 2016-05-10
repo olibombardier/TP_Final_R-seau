@@ -138,7 +138,13 @@
 
 
         #region reception
-
+        /// <summary>
+        /// Permet de recevoir un message en mode global
+        /// </summary>
+        public static void RecevoirMessage()
+        {
+            
+        }
 
         /// <summary>
         /// Permet de recevoir l'adresse IP ainsi que le Nom de l'utilisateur.
