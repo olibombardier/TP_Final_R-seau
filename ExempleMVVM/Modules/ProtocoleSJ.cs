@@ -147,6 +147,17 @@
         }
 
         /// <summary>
+        /// Retourne l'utilisateur à qui apartien l'endpoint
+        /// </summary>
+        /// <param name="endPoint">EndPoint</param>
+        /// <returns>L'utilisateur, null s'il n'est pas trouvé</returns>
+        public static Utilisateur TrouverUtilisateurSelonEndPoint(EndPoint endPoint)
+        {
+            string ip = ((IPEndPoint) endPoint).Address.ToString();
+            return profilApplication.UtilisateursConnectes.Where(u => u.IP == ip).First();
+        }
+
+        /// <summary>
         /// Permet de recevoir l'adresse IP ainsi que le Nom de l'utilisateur.
         /// </summary>
         public static async void Recevoir(Conversation conversation)
