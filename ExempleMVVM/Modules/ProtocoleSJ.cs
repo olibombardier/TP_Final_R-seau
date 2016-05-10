@@ -1,17 +1,18 @@
-﻿namespace ExempleMVVM.Modules
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using ExempleMVVM.Modeles;
+
+namespace ExempleMVVM.Modules
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Linq;
-    using System.Net;
-    using System.Net.Sockets;
-    using System.Security.Cryptography;
-    using System.Text;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using ExempleMVVM.Modeles;
 
     /// <summary>
     /// Protocole utilisant UDP 50000 permettant de clavarder avec plusieurs utilisateurs sans avoir
