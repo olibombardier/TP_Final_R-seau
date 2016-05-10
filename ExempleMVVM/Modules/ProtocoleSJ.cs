@@ -139,12 +139,15 @@ namespace ExempleMVVM.Modules
 
 
         #region reception
+
         /// <summary>
         /// Permet de recevoir un message en mode global
         /// </summary>
-        public static void RecevoirMessage()
+        public static void RecevoirMessage(Conversation conversation, string message)
         {
-            
+            LigneConversation ligne = new LigneConversation();
+            ligne.Message = message;
+            conversation.Lignes.Add(ligne);
         }
 
         /// <summary>
@@ -188,7 +191,7 @@ namespace ExempleMVVM.Modules
                             }
                             break;
                         case 'M':
-                            System.Diagnostics.Debug.WriteLine("Message");
+                            RecevoirMessage(conversation, message.Substring(4));
                             break;
                         case 'P':
                             System.Diagnostics.Debug.WriteLine("Privé");
