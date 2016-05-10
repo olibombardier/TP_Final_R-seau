@@ -166,11 +166,18 @@ namespace ExempleMVVM.Modules
         /// <summary>
         /// Permet de recevoir un message en mode global
         /// </summary>
-        public static void RecevoirMessage(Conversation conversation, string message)
+        public static void RecevoirMessage(Conversation conversation, string message, EndPoint endPoint)
         {
-            LigneConversation ligne = new LigneConversation();
-            ligne.Message = message;
-            conversation.Lignes.Add(ligne);
+            Utilisateur envoyeur = TrouverUtilisateurSelonEndPoint(endPoint);
+            IPAddress adresse = ((IPEndPoint)endPoint).Address;
+            if(!EstMonAdresse(adresse))
+            {
+                LigneConversation ligne = new LigneConversation();
+                ligne.Message = message;
+                ligne.Utilisateur = envoyeur;
+                conversation.Lignes.Add(ligne);
+
+            };
         }
 
         /// <summary>
@@ -232,7 +239,7 @@ namespace ExempleMVVM.Modules
                             }
                             break;
                         case 'M':
-                            RecevoirMessage(conversation, message.Substring(4));
+                            RecevoirMessage(conversation, message.Substring(4), otherEndPoint);
                             break;
                         case 'P':
                             System.Diagnostics.Debug.WriteLine("Privé");
