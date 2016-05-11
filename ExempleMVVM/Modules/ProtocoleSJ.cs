@@ -238,30 +238,34 @@ namespace ExempleMVVM.Modules
                 });
                 string message = Encoding.Unicode.GetString(data ,0 ,byteRead);
 
-                if(message.Substring(0, 3) == "TPR")
+                if(byteRead > 0)
                 {
-                    switch (message[3])
+                    if(message.Substring(0, 3) == "TPR")
                     {
-                        case 'D':
-                            EnvoyerIdentification(conversation);
-                            break;
-                        case 'I':
-                            if (conversation.EstGlobale)
-                            {
-                                RecevoirIdentification((IPEndPoint)otherEndPoint, message);
-                            }
-                            break;
-                        case 'M':
-                            RecevoirMessage(conversation, message.Substring(4), otherEndPoint);
-                            break;
-                        case 'P':
-                            System.Diagnostics.Debug.WriteLine("Privé");
-                            break;
-                        case 'Q':
-                            System.Diagnostics.Debug.WriteLine("Quitter");
-                            break;
+                        switch (message[3])
+                        {
+                            case 'D':
+                                EnvoyerIdentification(conversation);
+                                break;
+                            case 'I':
+                                if (conversation.EstGlobale)
+                                {
+                                    RecevoirIdentification((IPEndPoint)otherEndPoint, message);
+                                }
+                                break;
+                            case 'M':
+                                RecevoirMessage(conversation, message.Substring(4), otherEndPoint);
+                                break;
+                            case 'P':
+                                System.Diagnostics.Debug.WriteLine("Privé");
+                                break;
+                            case 'Q':
+                                System.Diagnostics.Debug.WriteLine("Quitter");
+                                break;
+                        }
                     }
                 }
+                
             }
         }
 
