@@ -237,32 +237,43 @@ namespace ExempleMVVM.Modules
 
                 if(byteRead > 0)
                 {
-                    if(message.Substring(0, 3) == "TPR")
-                    {
-                        switch (message[3])
-                        {
-                            case 'D':
-                                EnvoyerIdentification(conversation, otherEndPoint);
-                                break;
-                            case 'I':
-                                if (conversation.EstGlobale)
-                                {
-                                    RecevoirIdentification((IPEndPoint)otherEndPoint, message);
-                                }
-                                break;
-                            case 'M':
-                                RecevoirMessage(conversation, message.Substring(4), otherEndPoint);
-                                break;
-                            case 'P':
-                                System.Diagnostics.Debug.WriteLine("Privé");
-                                break;
-                            case 'Q':
-                                System.Diagnostics.Debug.WriteLine("Quitter");
-                                break;
-                        }
-                    }
+                    Interpreter(conversation, otherEndPoint, message);
                 }
                 
+            }
+        }
+
+        /// <summary>
+        /// Interprête un message reçu. Ne fait rien si le message n'est pas valide.
+        /// </summary>
+        /// <param name="conversation">Conversation d'ou provient le message</param>
+        /// <param name="otherEndPoint">Endpoint de celui qui envois le message si il s'agit de la conversation locale</param>
+        /// <param name="message">Message reçu</param>
+        public static void Interpreter(Conversation conversation, EndPoint otherEndPoint, string message)
+        {
+            if (message.Substring(0, 3) == "TPR")
+            {
+                switch (message[3])
+                {
+                    case 'D':
+                        EnvoyerIdentification(conversation, otherEndPoint);
+                        break;
+                    case 'I':
+                        if (conversation.EstGlobale)
+                        {
+                            RecevoirIdentification((IPEndPoint)otherEndPoint, message);
+                        }
+                        break;
+                    case 'M':
+                        RecevoirMessage(conversation, message.Substring(4), otherEndPoint);
+                        break;
+                    case 'P':
+                        System.Diagnostics.Debug.WriteLine("Privé");
+                        break;
+                    case 'Q':
+                        System.Diagnostics.Debug.WriteLine("Quitter");
+                        break;
+                }
             }
         }
 
