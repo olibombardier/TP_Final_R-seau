@@ -346,11 +346,18 @@ namespace ExempleMVVM.Modules
 
             if (!EstMonAdresse(adresse))
             {
-                utilisateurTemp.Add(new Utilisateur()
+                Utilisateur nouvelUtilisateur = new Utilisateur()
                 {
                     Nom = nom,
                     IP = adresse.ToString()
-                });
+                };
+                utilisateurTemp.Add(nouvelUtilisateur);
+                if(!profilApplication.UtilisateursConnectes.Any(u =>
+                    u.IP == nouvelUtilisateur.IP && u.Nom == nouvelUtilisateur.Nom))
+                {
+                    profilApplication.UtilisateursConnectes.Add(nouvelUtilisateur);
+                }
+
             }
         }
 
