@@ -39,10 +39,19 @@ namespace ExempleMVVM.Modules
         /// </summary>
         public const int port = 50000;
 
+        /// <summary>
+        /// Met ton adresse IP dans une liste
+        /// </summary>
         private static List<IPAddress> mesAdresse = new List<IPAddress>();
 
+        /// <summary>
+        /// Met un bool à 0 ou à 1 dépendant du fait ou l'application écoute ou non
+        /// </summary>
         private static bool enEcoute;
 
+        /// <summary>
+        /// Fait une liste d'utilisateurs afin de pouvoir rafraichir la liste
+        /// </summary>
         private static List<Utilisateur> utilisateurTemp = new List<Utilisateur>();
 
         /// <summary>
