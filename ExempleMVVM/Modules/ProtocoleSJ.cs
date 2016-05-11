@@ -177,14 +177,7 @@ namespace ExempleMVVM.Modules
             while (profilApplication.Connecte)
             {
                 EnvoyerDiscovery();
-<<<<<<< HEAD
-                Task.Delay(5000);
-||||||| merged common ancestors
-                Task.Delay(5000);
-                nouvelUtilisateur.Clear();
-=======
                 await Task.Delay(5000);
->>>>>>> 5dac64d8f418ae4e3fc868aecedc99e546826cb4
 
                 foreach (Utilisateur vieuxUtilisateur in profilApplication.UtilisateursConnectes)
                 {
@@ -205,27 +198,14 @@ namespace ExempleMVVM.Modules
                     profilApplication.UtilisateursConnectes.Remove(utilisateurASupprimer);
                 }
 
-<<<<<<< HEAD
                 foreach(Utilisateur utilisateurAAjouter in utilisateurTemp)
-||||||| merged common ancestors
-                foreach(Utilisateur utilisateurAAjouter in nouvelUtilisateur)
-=======
-                foreach (Utilisateur utilisateurAAjouter in utilisateurTemp)
->>>>>>> 5dac64d8f418ae4e3fc868aecedc99e546826cb4
+
                 {
                     profilApplication.UtilisateursConnectes.Add(utilisateurAAjouter);
                 }
-<<<<<<< HEAD
-                utilisateurTemp.Clear();
-            });
-||||||| merged common ancestors
-
-            });
-=======
                 utilisateurTemp.Clear();
                 listeASupprimer.Clear();
             }
->>>>>>> 5dac64d8f418ae4e3fc868aecedc99e546826cb4
         }
 
         /// <summary>
