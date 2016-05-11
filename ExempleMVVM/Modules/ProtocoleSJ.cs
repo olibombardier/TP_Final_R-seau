@@ -43,6 +43,8 @@ namespace ExempleMVVM.Modules
 
         private static bool enEcoute;
 
+        private static List<Utilisateur> utilisateurTemp = new List<Utilisateur>();
+
         /// <summary>
         /// Permet de vérifier si le nom d'utilisateur d'un profil est déjà utilisé sur le réseau et
         /// de démarre l'écoute sur le port 50000 UDP pour répondre au demande des autres
@@ -89,6 +91,13 @@ namespace ExempleMVVM.Modules
             EnvoyerDiscovery();
 
             await Task.Delay(5000);
+            
+            foreach(Utilisateur utilisateur in utilisateurTemp)
+            {
+                profilApplication.UtilisateursConnectes.Add(utilisateur);
+            }
+
+            utilisateurTemp.Clear();
 
             if (!profil.UtilisateursConnectes.Any(u => u.Nom == profil.UtilisateurLocal.Nom))
             {
@@ -283,7 +292,7 @@ namespace ExempleMVVM.Modules
             if (!(profilApplication.UtilisateursConnectes.Any(u => u.IP == adresse.ToString()) ||
                 EstMonAdresse(adresse)))
             {
-                profilApplication.UtilisateursConnectes.Add(new Utilisateur()
+                utilisateurTemp.Add(new Utilisateur()
                 {
                     Nom = nom,
                     IP = adresse.ToString()
