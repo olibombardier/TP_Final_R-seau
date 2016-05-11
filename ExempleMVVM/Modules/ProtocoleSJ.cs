@@ -108,8 +108,8 @@ namespace ExempleMVVM.Modules
             EnvoyerDiscovery();
 
             await Task.Delay(5000);
-            
-            foreach(Utilisateur utilisateur in utilisateurTemp)
+
+            foreach (Utilisateur utilisateur in utilisateurTemp)
             {
                 profilApplication.UtilisateursConnectes.Add(utilisateur);
             }
@@ -128,7 +128,7 @@ namespace ExempleMVVM.Modules
 
             profil.ConnexionEnCours = false;
         }
-        
+
         /// <summary>
         /// Méthode permettant de fermer toutes les connexions en cours (UDP et TCP)
         /// </summary>
@@ -174,11 +174,10 @@ namespace ExempleMVVM.Modules
         /// </summary>
         public static async void RafraichirListeUtilisateursConnectes()
         {
-            await Task.Factory.StartNew(() =>
+            while (profilApplication.Connecte)
             {
                 EnvoyerDiscovery();
-                Task.Delay(5000);
-                nouvelUtilisateur.Clear();
+                await Task.Delay(5000);
 
                 foreach (Utilisateur vieuxUtilisateur in profilApplication.UtilisateursConnectes)
                 {
@@ -194,17 +193,18 @@ namespace ExempleMVVM.Modules
                     }
                 }
 
-                foreach(Utilisateur utilisateurASupprimer in listeASupprimer)
+                foreach (Utilisateur utilisateurASupprimer in listeASupprimer)
                 {
                     profilApplication.UtilisateursConnectes.Remove(utilisateurASupprimer);
                 }
 
-                foreach(Utilisateur utilisateurAAjouter in nouvelUtilisateur)
+                foreach (Utilisateur utilisateurAAjouter in utilisateurTemp)
                 {
                     profilApplication.UtilisateursConnectes.Add(utilisateurAAjouter);
                 }
-
-            });
+                utilisateurTemp.Clear();
+                listeASupprimer.Clear();
+            }
         }
 
         /// <summary>
@@ -226,7 +226,7 @@ namespace ExempleMVVM.Modules
         {
             Utilisateur envoyeur = TrouverUtilisateurSelonEndPoint(endPoint);
             IPAddress adresse = ((IPEndPoint)endPoint).Address;
-            if(!EstMonAdresse(adresse))
+            if (!EstMonAdresse(adresse))
             {
                 LigneConversation ligne = new LigneConversation();
                 ligne.Message = message;
@@ -243,7 +243,7 @@ namespace ExempleMVVM.Modules
         /// <returns>L'utilisateur, null s'il n'est pas trouvé</returns>
         public static Utilisateur TrouverUtilisateurSelonEndPoint(EndPoint endPoint)
         {
-            string ip = ((IPEndPoint) endPoint).Address.ToString();
+            string ip = ((IPEndPoint)endPoint).Address.ToString();
             Utilisateur resultat = null;
 
             if (profilApplication.UtilisateursConnectes.Count > 0)
@@ -273,7 +273,8 @@ namespace ExempleMVVM.Modules
 
                 await Task.Factory.StartNew(() =>
                 {
-                    try{
+                    try
+                    {
                         if (conversation.EstPrivee)
                         {
                             byteRead = conversation.Socket.Receive(data);
@@ -283,19 +284,19 @@ namespace ExempleMVVM.Modules
                             byteRead = conversation.Socket.ReceiveFrom(data, ref otherEndPoint);
                         }
                     }
-                    catch(Exception)
+                    catch (Exception)
                     {
                         profilApplication.Connecte = false;
                         enEcoute = false;
                     }
                 });
-                string message = Encoding.Unicode.GetString(data ,0 ,byteRead);
+                string message = Encoding.Unicode.GetString(data, 0, byteRead);
 
-                if(byteRead > 0)
+                if (byteRead > 0)
                 {
                     Interpreter(conversation, otherEndPoint, message);
                 }
-                
+
             }
         }
 
@@ -342,8 +343,7 @@ namespace ExempleMVVM.Modules
             string nom = message.Substring(4);
             IPAddress adresse = endpoint.Address;
 
-            if (!(profilApplication.UtilisateursConnectes.Any(u => u.IP == adresse.ToString()) ||
-                EstMonAdresse(adresse)))
+            if (!EstMonAdresse(adresse))
             {
                 utilisateurTemp.Add(new Utilisateur()
                 {
@@ -385,7 +385,7 @@ namespace ExempleMVVM.Modules
                     // Envoyer juste au bonne personnes
                     foreach (Utilisateur utilisateur in profilApplication.UtilisateursConnectes)
                     {
-                        IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(utilisateur.IP),port);
+                        IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(utilisateur.IP), port);
                         conversation.Socket.SendTo(data, endPoint);
                     }
                 });
@@ -482,7 +482,7 @@ namespace ExempleMVVM.Modules
         /// </summary>
         public static async void EnvoyerDiscovery()
         {
-            EnvoyerBroadcast(conversationGlobale,"D");
+            EnvoyerBroadcast(conversationGlobale, "D");
         }
 
         /// <summary>
@@ -503,7 +503,7 @@ namespace ExempleMVVM.Modules
             byte[] cle = new byte[128];
             for (int i = 0; i < 128; i++)
             {
-                
+
             }
         }
 
