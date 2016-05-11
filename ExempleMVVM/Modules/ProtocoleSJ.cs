@@ -321,7 +321,11 @@ namespace ExempleMVVM.Modules
                 await Task.Factory.StartNew(() =>
                 {
                     // Envoyer juste au bonne personnes
-                    conversation.Socket.SendTo(data, new IPEndPoint(IPAddress.Broadcast, port));
+                    foreach (Utilisateur utilisateur in profilApplication.UtilisateursConnectes)
+                    {
+                        IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(utilisateur.IP),port);
+                        conversation.Socket.SendTo(data, endPoint);
+                    }
                 });
             }
             else // Conversation privée
