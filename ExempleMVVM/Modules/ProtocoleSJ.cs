@@ -39,9 +39,28 @@ namespace ExempleMVVM.Modules
         /// </summary>
         public const int port = 50000;
 
+        /// <summary>
+        /// Met ton adresse IP dans une liste
+        /// </summary>
         private static List<IPAddress> mesAdresse = new List<IPAddress>();
 
+        /// <summary>
+        /// Met un bool à True ou False dépendant du fait ou l'application écoute ou non
+        /// </summary>
         private static bool enEcoute;
+
+        /// <summary>
+        /// Fait une liste d'utilisateurs afin de pouvoir rafraichir la liste
+        /// </summary>
+        private static List<Utilisateur> utilisateurTemp = new List<Utilisateur>();
+
+        private static List<Utilisateur> listeASupprimer = new List<Utilisateur>();
+
+        private static List<Utilisateur> utilisateurASupprimer = new List<Utilisateur>();
+
+        private static List<Utilisateur> utilisateurAAjouter = new List<Utilisateur>();
+
+        private static List<Utilisateur> nouvelUtilisateur = new List<Utilisateur>();
 
         /// <summary>
         /// Permet de vérifier si le nom d'utilisateur d'un profil est déjà utilisé sur le réseau et
@@ -89,6 +108,13 @@ namespace ExempleMVVM.Modules
             EnvoyerDiscovery();
 
             await Task.Delay(5000);
+            
+            foreach(Utilisateur utilisateur in utilisateurTemp)
+            {
+                profilApplication.UtilisateursConnectes.Add(utilisateur);
+            }
+
+            utilisateurTemp.Clear();
 
             if (!profil.UtilisateursConnectes.Any(u => u.Nom == profil.UtilisateurLocal.Nom))
             {
@@ -148,7 +174,37 @@ namespace ExempleMVVM.Modules
         /// </summary>
         public static async void RafraichirListeUtilisateursConnectes()
         {
-            //throw new NotImplementedException();
+            await Task.Factory.StartNew(() =>
+            {
+                EnvoyerDiscovery();
+                Task.Delay(5000);
+                nouvelUtilisateur.Clear();
+
+                foreach (Utilisateur vieuxUtilisateur in profilApplication.UtilisateursConnectes)
+                {
+                    Utilisateur utilisateur = utilisateurTemp.Find((nouvelUtilisateur) =>
+                    vieuxUtilisateur.Nom == nouvelUtilisateur.Nom && vieuxUtilisateur.IP == nouvelUtilisateur.IP);
+                    if (utilisateur == null)
+                    {
+                        listeASupprimer.Add(vieuxUtilisateur);
+                    }
+                    else
+                    {
+                        utilisateurTemp.Remove(utilisateur);
+                    }
+                }
+
+                foreach(Utilisateur utilisateurASupprimer in listeASupprimer)
+                {
+                    profilApplication.UtilisateursConnectes.Remove(utilisateurASupprimer);
+                }
+
+                foreach(Utilisateur utilisateurAAjouter in nouvelUtilisateur)
+                {
+                    profilApplication.UtilisateursConnectes.Add(utilisateurAAjouter);
+                }
+
+            });
         }
 
         /// <summary>
@@ -289,7 +345,7 @@ namespace ExempleMVVM.Modules
             if (!(profilApplication.UtilisateursConnectes.Any(u => u.IP == adresse.ToString()) ||
                 EstMonAdresse(adresse)))
             {
-                profilApplication.UtilisateursConnectes.Add(new Utilisateur()
+                utilisateurTemp.Add(new Utilisateur()
                 {
                     Nom = nom,
                     IP = adresse.ToString()
