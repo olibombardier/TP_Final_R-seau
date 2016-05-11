@@ -54,6 +54,14 @@ namespace ExempleMVVM.Modules
         /// </summary>
         private static List<Utilisateur> utilisateurTemp = new List<Utilisateur>();
 
+        private static List<Utilisateur> listeASupprimer = new List<Utilisateur>();
+
+        private static List<Utilisateur> utilisateurASupprimer = new List<Utilisateur>();
+
+        private static List<Utilisateur> utilisateurAAjouter = new List<Utilisateur>();
+
+        private static List<Utilisateur> nouvelUtilisateur = new List<Utilisateur>();
+
         /// <summary>
         /// Permet de vérifier si le nom d'utilisateur d'un profil est déjà utilisé sur le réseau et
         /// de démarre l'écoute sur le port 50000 UDP pour répondre au demande des autres
@@ -170,6 +178,31 @@ namespace ExempleMVVM.Modules
             {
                 EnvoyerDiscovery();
                 Task.Delay(5000);
+                nouvelUtilisateur.Clear();
+
+                foreach (Utilisateur vieuxUtilisateur in profilApplication.UtilisateursConnectes)
+                {
+                    Utilisateur utilisateur = utilisateurTemp.Find((nouvelUtilisateur) =>
+                    vieuxUtilisateur.Nom == nouvelUtilisateur.Nom && vieuxUtilisateur.IP == nouvelUtilisateur.IP);
+                    if (utilisateur == null)
+                    {
+                        listeASupprimer.Add(vieuxUtilisateur);
+                    }
+                    else
+                    {
+                        utilisateurTemp.Remove(utilisateur);
+                    }
+                }
+
+                foreach(Utilisateur utilisateurASupprimer in listeASupprimer)
+                {
+                    profilApplication.UtilisateursConnectes.Remove(utilisateurASupprimer);
+                }
+
+                foreach(Utilisateur utilisateurAAjouter in nouvelUtilisateur)
+                {
+                    profilApplication.UtilisateursConnectes.Add(utilisateurAAjouter);
+                }
 
             });
         }
