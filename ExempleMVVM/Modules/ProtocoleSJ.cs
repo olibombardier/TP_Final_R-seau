@@ -45,7 +45,7 @@ namespace ExempleMVVM.Modules
         private static List<IPAddress> mesAdresse = new List<IPAddress>();
 
         /// <summary>
-        /// Met un bool à 0 ou à 1 dépendant du fait ou l'application écoute ou non
+        /// Met un bool à True ou False dépendant du fait ou l'application écoute ou non
         /// </summary>
         private static bool enEcoute;
 
