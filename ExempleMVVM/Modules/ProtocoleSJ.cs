@@ -151,7 +151,12 @@ namespace ExempleMVVM.Modules
         /// </summary>
         public static async void RafraichirListeUtilisateursConnectes()
         {
-            //throw new NotImplementedException();
+            await Task.Factory.StartNew(() =>
+            {
+                EnvoyerDiscovery();
+                Task.Delay(5000);
+
+            });
         }
 
         /// <summary>
