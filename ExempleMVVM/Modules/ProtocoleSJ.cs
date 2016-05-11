@@ -39,7 +39,9 @@ namespace ExempleMVVM.Modules
         /// </summary>
         public const int port = 50000;
 
-        public static List<IPAddress> mesAdresse = new List<IPAddress>();
+        private static List<IPAddress> mesAdresse = new List<IPAddress>();
+
+        private static bool enEcoute;
 
         /// <summary>
         /// Permet de vérifier si le nom d'utilisateur d'un profil est déjà utilisé sur le réseau et
@@ -94,6 +96,7 @@ namespace ExempleMVVM.Modules
             }
             else
             {
+                enEcoute = false;
                 conversationGlobale.Socket.Close();
             }
 
@@ -207,9 +210,8 @@ namespace ExempleMVVM.Modules
         /// </summary>
         public static async void Recevoir(Conversation conversation)
         {
-            bool Connecte = false; 
-
-            while (!Connecte)
+            enEcoute = true;
+            while (enEcoute)
             {
                 byte[] data = new byte[1024];
 
@@ -218,13 +220,20 @@ namespace ExempleMVVM.Modules
 
                 await Task.Factory.StartNew(() =>
                 {
-                    if (conversation.EstPrivee)
-                    {
-                        byteRead = conversation.Socket.Receive(data);
+                    try{
+                        if (conversation.EstPrivee)
+                        {
+                            byteRead = conversation.Socket.Receive(data);
+                        }
+                        else
+                        {
+                            byteRead = conversation.Socket.ReceiveFrom(data, ref otherEndPoint);
+                        }
                     }
-                    else
+                    catch(Exception)
                     {
-                        byteRead = conversation.Socket.ReceiveFrom(data, ref otherEndPoint);
+                        profilApplication.Connecte = false;
+                        enEcoute = false;
                     }
                 });
                 string message = Encoding.Unicode.GetString(data ,0 ,byteRead);
