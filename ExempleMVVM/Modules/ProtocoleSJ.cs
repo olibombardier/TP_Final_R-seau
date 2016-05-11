@@ -62,6 +62,8 @@ namespace ExempleMVVM.Modules
 
         private static List<Utilisateur> nouvelUtilisateur = new List<Utilisateur>();
 
+        private static Random random = new Random();
+
         /// <summary>
         /// Permet de vérifier si le nom d'utilisateur d'un profil est déjà utilisé sur le réseau et
         /// de démarre l'écoute sur le port 50000 UDP pour répondre au demande des autres
@@ -271,6 +273,7 @@ namespace ExempleMVVM.Modules
 
                 int byteRead = 0;
                 EndPoint otherEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                LigneConversation messageErreur = null;
 
                 await Task.Factory.StartNew(() =>
                 {
@@ -285,10 +288,11 @@ namespace ExempleMVVM.Modules
                             byteRead = conversation.Socket.ReceiveFrom(data, ref otherEndPoint);
                         }
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        profilApplication.Connecte = false;
-                        enEcoute = false;
+                        messageErreur = new LigneConversation();
+                        messageErreur.Message = e.Message;
+                        messageErreur.Utilisateur = new Utilisateur() { IP = "Erreur" };
                     }
                 });
                 string message = Encoding.Unicode.GetString(data, 0, byteRead);
@@ -298,6 +302,11 @@ namespace ExempleMVVM.Modules
                     Interpreter(conversation, otherEndPoint, message);
                 }
 
+                if (messageErreur != null)
+                {
+                    conversation.Lignes.Add(messageErreur);
+                    messageErreur = null;
+                }
             }
         }
 
@@ -509,10 +518,8 @@ namespace ExempleMVVM.Modules
         public static async void EnvoyerDemendeConversationPrivee(Conversation conversationGlobale)
         {
             byte[] cle = new byte[128];
-            for (int i = 0; i < 128; i++)
-            {
 
-            }
+            random.NextBytes(cle);
         }
 
         #endregion Envois
