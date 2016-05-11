@@ -101,9 +101,6 @@ namespace ExempleMVVM.Modules
             }
 
             profil.ConnexionEnCours = false;
-
-
-            
         }
         
         /// <summary>
@@ -318,6 +315,7 @@ namespace ExempleMVVM.Modules
                 byte[] data = Encoding.Unicode.GetBytes(messageComplet);
                 await Task.Factory.StartNew(() =>
                 {
+                    // Envoyer juste au bonne personnes
                     conversation.Socket.SendTo(data, new IPEndPoint(IPAddress.Broadcast, port));
                 });
             }
@@ -329,6 +327,44 @@ namespace ExempleMVVM.Modules
                     conversation.Socket.Send(data);
                 });
             }
+        }
+
+        /// <summary>
+        /// Envoie un message en broadcast
+        /// </summary>
+        /// <param name="conversation">Conversation ayant un socket UDP</param>
+        /// <param name="message">Message à envoyer</param>
+        public static void EnvoyerBroadcast(Conversation conversation, string message)
+        {
+            byte[] data = Encoding.Unicode.GetBytes("TPR" + message);
+            foreach (var broadcast in ObtenirAdressesBroadcast())
+            {
+                conversation.Socket.SendTo(data, 0, data.Length, SocketFlags.None, new IPEndPoint(broadcast, 50000));
+            }
+        }
+
+        /// <summary>
+        /// Permet d'obtenir la liste des adresses Broadcast disponibles. La fonction élimine les adresses des cartes Loopback et des cartes qui ne sont pas branchées.
+        /// </summary>
+        /// <returns>La liste des adresses Broadcast disponibles. La fonction élimine les adresses des cartes Loopback et des cartes qui ne sont pas branchées.</returns>
+        private static HashSet<IPAddress> ObtenirAdressesBroadcast()
+        {
+            HashSet<IPAddress> broadcasts = new HashSet<IPAddress>();
+            foreach (var i in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (i.OperationalStatus == OperationalStatus.Up && i.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+                {
+                    foreach (var ua in i.GetIPProperties().UnicastAddresses)
+                    {
+                        if (ua.Address.AddressFamily == AddressFamily.InterNetwork)
+                        {
+                            IPAddress broadcast = new IPAddress(BitConverter.ToUInt32(ua.Address.GetAddressBytes(), 0) | (BitConverter.ToUInt32(ua.IPv4Mask.GetAddressBytes(), 0) ^ BitConverter.ToUInt32(IPAddress.Broadcast.GetAddressBytes(), 0)));
+                            broadcasts.Add(broadcast);
+                        }
+                    }
+                }
+            }
+            return broadcasts;
         }
 
         public static byte[] Encrypter(string message, byte[] cle)
@@ -348,10 +384,8 @@ namespace ExempleMVVM.Modules
             {
                 using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encrypteur, CryptoStreamMode.Write))
                 {
-                    using (StreamWriter writer = new StreamWriter(cryptoStream))
-                    {
-                        writer.Write(message);
-                    }
+                    byte[] data = Encoding.Unicode.GetBytes(message);
+                    cryptoStream.Write(data, 0, data.Length);
                 }
             }
             return resultat;
@@ -362,7 +396,7 @@ namespace ExempleMVVM.Modules
         /// </summary>
         public static async void EnvoyerDiscovery()
         {
-            Envoyer(conversationGlobale,"D");
+            EnvoyerBroadcast(conversationGlobale,"D");
         }
 
         /// <summary>
@@ -375,12 +409,16 @@ namespace ExempleMVVM.Modules
         }
 
         /// <summary>
-        /// Indique à l'autre utilisateur qu'on a
+        /// Indique à l'autre utilisateur qu'on a ouvert un port et on attend un conversation privée
         /// </summary>
-        /// <param name="nouvelleConversation"></param>
-        public static async void EnvoyerDemendeConversationPrivee(Conversation conversation)
+        /// <param name="conversationGlobale">Conversation globale</param>
+        public static async void EnvoyerDemendeConversationPrivee(Conversation conversationGlobale)
         {
-
+            byte[] cle = new byte[128];
+            for (int i = 0; i < 128; i++)
+            {
+                
+            }
         }
 
         #endregion Envois
