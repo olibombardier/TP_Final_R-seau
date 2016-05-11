@@ -242,7 +242,7 @@ namespace ExempleMVVM.Modules
                         switch (message[3])
                         {
                             case 'D':
-                                EnvoyerIdentification(conversation);
+                                EnvoyerIdentification(conversation, otherEndPoint);
                                 break;
                             case 'I':
                                 if (conversation.EstGlobale)
@@ -334,6 +334,21 @@ namespace ExempleMVVM.Modules
         }
 
         /// <summary>
+        /// Envois un message en UDP au endPoint spécifié. À utiliser pour envoyer un
+        /// message à quelqu'un qui n'est pas dans la liste d'utilisateur.
+        /// </summary>
+        /// <param name="endPoint">Destination</param>
+        /// <param name="socket">Socket par lequel envoyer le message</param>
+        /// <param name="message">Message à envoyer</param>
+        public static async void Envoyer(EndPoint endPoint, Socket socket, string message)
+        {
+            await Task.Factory.StartNew(() =>
+            {
+                socket.SendTo(Encoding.Unicode.GetBytes("TPR" + message), endPoint);
+            });
+        }
+
+        /// <summary>
         /// Envoie un message en broadcast
         /// </summary>
         /// <param name="conversation">Conversation ayant un socket UDP</param>
@@ -407,9 +422,9 @@ namespace ExempleMVVM.Modules
         /// Envois le nom de l'utilisateur à la conversation fournie
         /// </summary>
         /// <param name="conversation"></param>
-        public static async void EnvoyerIdentification(Conversation conversation)
+        public static async void EnvoyerIdentification(Conversation conversation, EndPoint endpoint)
         {
-            Envoyer(conversation, "I" + profilApplication.Nom);
+            Envoyer(endpoint, conversation.Socket, "I" + profilApplication.Nom);
         }
 
         /// <summary>
