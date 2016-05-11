@@ -178,12 +178,11 @@ namespace ExempleMVVM.Modules
             {
                 EnvoyerDiscovery();
                 Task.Delay(5000);
-                nouvelUtilisateur.Clear();
 
                 foreach (Utilisateur vieuxUtilisateur in profilApplication.UtilisateursConnectes)
                 {
-                    Utilisateur utilisateur = utilisateurTemp.Find((nouvelUtilisateur) =>
-                    vieuxUtilisateur.Nom == nouvelUtilisateur.Nom && vieuxUtilisateur.IP == nouvelUtilisateur.IP);
+                    Utilisateur utilisateur = utilisateurTemp.Find((u) =>
+                    vieuxUtilisateur.Nom == u.Nom && vieuxUtilisateur.IP == u.IP);
                     if (utilisateur == null)
                     {
                         listeASupprimer.Add(vieuxUtilisateur);
@@ -199,11 +198,11 @@ namespace ExempleMVVM.Modules
                     profilApplication.UtilisateursConnectes.Remove(utilisateurASupprimer);
                 }
 
-                foreach(Utilisateur utilisateurAAjouter in nouvelUtilisateur)
+                foreach(Utilisateur utilisateurAAjouter in utilisateurTemp)
                 {
                     profilApplication.UtilisateursConnectes.Add(utilisateurAAjouter);
                 }
-
+                utilisateurTemp.Clear();
             });
         }
 
