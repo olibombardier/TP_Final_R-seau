@@ -248,8 +248,7 @@ namespace ExempleMVVM.Modules
                     profilApplication.UtilisateursConnectes.Remove(utilisateurASupprimer);
                 }
 
-                foreach(Utilisateur utilisateurAAjouter in utilisateurTemp)
-
+                foreach (Utilisateur utilisateurAAjouter in utilisateurTemp)
                 {
                     profilApplication.UtilisateursConnectes.Add(utilisateurAAjouter);
                 }
@@ -329,12 +328,13 @@ namespace ExempleMVVM.Modules
 
                 await Task.Factory.StartNew(() =>
                 {
-                    if(conversation.Socket.Poll(500, SelectMode.SelectRead))
+                    try
                     {
-                        if (conversation.Socket.Available > 0)
+                        if (conversation.Socket.Poll(500, SelectMode.SelectRead))
                         {
-                            try
+                            if (conversation.Socket.Available > 0)
                             {
+
                                 if (conversation.EstPrivee)
                                 {
                                     byteRead = conversation.Socket.Receive(data);
@@ -344,17 +344,17 @@ namespace ExempleMVVM.Modules
                                     byteRead = conversation.Socket.ReceiveFrom(data, ref otherEndPoint);
                                 }
                             }
-                            catch (Exception e)
-                            {
-                                messageErreur = new LigneConversation();
-                                messageErreur.Message = e.Message;
-                                messageErreur.Utilisateur = new Utilisateur() { IP = "Erreur" };
-                            }
                         }
                         else
                         {
                             socketLisible = false;
                         }
+                    }
+                    catch (Exception e)
+                    {
+                        messageErreur = new LigneConversation();
+                        messageErreur.Message = e.Message;
+                        messageErreur.Utilisateur = new Utilisateur() { IP = "Erreur" };
                     }
                 });
                 string message = Encoding.Unicode.GetString(data, 0, byteRead);
@@ -424,7 +424,7 @@ namespace ExempleMVVM.Modules
                     IP = adresse.ToString()
                 };
                 utilisateurTemp.Add(nouvelUtilisateur);
-                if(!profilApplication.UtilisateursConnectes.Any(u =>
+                if (!profilApplication.UtilisateursConnectes.Any(u =>
                     u.IP == nouvelUtilisateur.IP && u.Nom == nouvelUtilisateur.Nom))
                 {
                     profilApplication.UtilisateursConnectes.Add(nouvelUtilisateur);
@@ -453,7 +453,7 @@ namespace ExempleMVVM.Modules
             int port = Int32.Parse(stringPort, System.Globalization.NumberStyles.HexNumber);
 
             nouvelleConversation.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            
+
             await Task.Factory.StartNew(() =>
             {
                 nouvelleConversation.Socket.Connect(IPAddress.Parse(autre.IP), port);
