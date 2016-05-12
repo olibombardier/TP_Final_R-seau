@@ -311,29 +311,32 @@ namespace ExempleMVVM.Modules
 
                 await Task.Factory.StartNew(() =>
                 {
-                    if(conversation.Socket.Poll(500, SelectMode.SelectRead) && conversation.Socket.Available > 0)
+                    if(conversation.Socket.Poll(500, SelectMode.SelectRead))
                     {
-                        try
+                        if (conversation.Socket.Available > 0)
                         {
-                            if (conversation.EstPrivee)
+                            try
                             {
-                                byteRead = conversation.Socket.Receive(data);
+                                if (conversation.EstPrivee)
+                                {
+                                    byteRead = conversation.Socket.Receive(data);
+                                }
+                                else
+                                {
+                                    byteRead = conversation.Socket.ReceiveFrom(data, ref otherEndPoint);
+                                }
                             }
-                            else
+                            catch (Exception e)
                             {
-                                byteRead = conversation.Socket.ReceiveFrom(data, ref otherEndPoint);
+                                messageErreur = new LigneConversation();
+                                messageErreur.Message = e.Message;
+                                messageErreur.Utilisateur = new Utilisateur() { IP = "Erreur" };
                             }
                         }
-                        catch (Exception e)
+                        else
                         {
-                            messageErreur = new LigneConversation();
-                            messageErreur.Message = e.Message;
-                            messageErreur.Utilisateur = new Utilisateur() { IP = "Erreur" };
+                            socketLisible = false;
                         }
-                    }
-                    else
-                    {
-                        socketLisible = false;
                     }
                 });
                 string message = Encoding.Unicode.GetString(data, 0, byteRead);
