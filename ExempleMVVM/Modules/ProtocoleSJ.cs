@@ -344,11 +344,12 @@ namespace ExempleMVVM.Modules
                                     byteRead = conversation.Socket.ReceiveFrom(data, ref otherEndPoint);
                                 }
                             }
+                            else
+                            {
+                                socketLisible = false;
+                            }
                         }
-                        else
-                        {
-                            socketLisible = false;
-                        }
+                        
                     }
                     catch (Exception e)
                     {
