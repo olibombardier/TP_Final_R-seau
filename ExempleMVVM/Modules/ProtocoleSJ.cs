@@ -299,7 +299,7 @@ namespace ExempleMVVM.Modules
         public static async void Recevoir(Conversation conversation)
         {
             enEcoute = true;
-            while (enEcoute && conversation.Socket.Connected)
+            while (enEcoute)
             {
                 byte[] data = new byte[1024];
 
