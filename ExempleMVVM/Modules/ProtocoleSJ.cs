@@ -276,7 +276,16 @@ namespace ExempleMVVM.Modules
         /// </summary>
         public static void RecevoirMessage(Conversation conversation, string message, EndPoint endPoint)
         {
-            Utilisateur envoyeur = TrouverUtilisateurSelonEndPoint(endPoint);
+            Utilisateur envoyeur;
+            if (conversation.EstGlobale)
+            {
+                envoyeur = TrouverUtilisateurSelonEndPoint(endPoint);
+            }
+            else
+            {
+                envoyeur = conversation.Utilisateur;
+            }
+            
             IPAddress adresse = ((IPEndPoint)endPoint).Address;
             if (!EstMonAdresse(adresse))
             {
@@ -349,7 +358,6 @@ namespace ExempleMVVM.Modules
                                 socketLisible = false;
                             }
                         }
-                        
                     }
                     catch (Exception e)
                     {
