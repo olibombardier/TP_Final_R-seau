@@ -561,6 +561,32 @@ namespace ExempleMVVM.Modules
             return resultat;
         }
 
+        public static string Decrypter(byte[] message, byte[] cle)
+        {
+            string resultat = null;
+            Aes aes = Aes.Create();
+
+            if (cle.Length != 128)
+            {
+                throw new ArgumentException("La clé doit être de 128 bits");
+            }
+
+            aes.Key = cle;
+
+            ICryptoTransform decrypteur = aes.CreateDecryptor();
+            using (MemoryStream memoryStream = new MemoryStream(message))
+            {
+                using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decrypteur, CryptoStreamMode.Read))
+                {
+                    using (StreamReader streamReader = new StreamReader(cryptoStream))
+                    {
+                        resultat = streamReader.ReadToEnd();
+                    }
+                }
+            }
+            return resultat;
+        }
+
         /// <summary>
         /// Envois un message de discovery en broadcast
         /// </summary>
