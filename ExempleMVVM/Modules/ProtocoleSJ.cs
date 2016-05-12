@@ -299,7 +299,9 @@ namespace ExempleMVVM.Modules
         public static async void Recevoir(Conversation conversation)
         {
             enEcoute = true;
-            while (enEcoute)
+            bool socketLisible = true;
+
+            while (enEcoute && socketLisible)
             {
                 byte[] data = new byte[1024];
 
@@ -309,22 +311,29 @@ namespace ExempleMVVM.Modules
 
                 await Task.Factory.StartNew(() =>
                 {
-                    try
+                    if(conversation.Socket.Poll(500, SelectMode.SelectRead) && conversation.Socket.Available > 0)
                     {
-                        if (conversation.EstPrivee)
+                        try
                         {
-                            byteRead = conversation.Socket.Receive(data);
+                            if (conversation.EstPrivee)
+                            {
+                                byteRead = conversation.Socket.Receive(data);
+                            }
+                            else
+                            {
+                                byteRead = conversation.Socket.ReceiveFrom(data, ref otherEndPoint);
+                            }
                         }
-                        else
+                        catch (Exception e)
                         {
-                            byteRead = conversation.Socket.ReceiveFrom(data, ref otherEndPoint);
+                            messageErreur = new LigneConversation();
+                            messageErreur.Message = e.Message;
+                            messageErreur.Utilisateur = new Utilisateur() { IP = "Erreur" };
                         }
                     }
-                    catch (Exception e)
+                    else
                     {
-                        messageErreur = new LigneConversation();
-                        messageErreur.Message = e.Message;
-                        messageErreur.Utilisateur = new Utilisateur() { IP = "Erreur" };
+                        socketLisible = false;
                     }
                 });
                 string message = Encoding.Unicode.GetString(data, 0, byteRead);
@@ -340,6 +349,7 @@ namespace ExempleMVVM.Modules
                     messageErreur = null;
                 }
             }
+            System.Diagnostics.Debug.WriteLine("Recevoir fini");
         }
 
         /// <summary>
