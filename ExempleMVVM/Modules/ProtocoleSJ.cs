@@ -155,9 +155,10 @@ namespace ExempleMVVM.Modules
         /// <param name="nouvelleConversation">Conversation privée contenant l'utilisateur distant</param>
         public static async void DemarrerConversationPrivee(Conversation nouvelleConversation)
         {
-            byte[] cle = new byte[128];
+            byte[] cle = new byte[16];
             StringBuilder stringBuilderCle = new StringBuilder();
             short port = 0;
+            string stringCle, stringPort;
 
             random.NextBytes(cle);
             nouvelleConversation.Key = cle;
@@ -172,19 +173,19 @@ namespace ExempleMVVM.Modules
                 stringBuilderCle.Append(String.Format("{0:x2}", b));
             }
 
-            // TODO envoyer
+            stringCle = stringBuilderCle.ToString();
+            stringPort = String.Format("{0:x4}", port);
 
-            // test
-            LigneConversation test = new LigneConversation();
-            test.Message = String.Format("{0:x4} {1}", port, stringBuilderCle.ToString());
-            nouvelleConversation.Lignes.Add(test);
-            //
+            EnvoyerDemendeConversationPrivee(stringCle, stringPort, nouvelleConversation.Utilisateur);
 
             await Task.Factory.StartNew(() =>
                 {
                     nouvelleConversation.Socket = socketEcoute.Accept();
+                    nouvelleConversation.Connecte = true;
                 });
             socketEcoute.Close();
+
+            Recevoir(nouvelleConversation);
         }
 
         /// <summary>
@@ -245,7 +246,9 @@ namespace ExempleMVVM.Modules
         /// <param name="conversation">Conversation à fermer</param>
         public static void TerminerConversationPrivee(Conversation conversation)
         {
-            //throw new NotImplementedException();
+            conversation.Socket.Close();
+            conversation.Connecte = false;
+            profilApplication.Conversations.Remove(conversation);
         }
 
 
@@ -296,7 +299,8 @@ namespace ExempleMVVM.Modules
         public static async void Recevoir(Conversation conversation)
         {
             enEcoute = true;
-            while (enEcoute)
+            while ((enEcoute && conversation.EstGlobale) ||
+                (conversation.Connecte))
             {
                 byte[] data = new byte[1024];
 
@@ -364,7 +368,7 @@ namespace ExempleMVVM.Modules
                         RecevoirMessage(conversation, message.Substring(4), otherEndPoint);
                         break;
                     case 'P':
-                        System.Diagnostics.Debug.WriteLine("Privé");
+                        RecevoirDemandeConversationPrivee(otherEndPoint, message.Substring(4));
                         break;
                     case 'Q':
                         System.Diagnostics.Debug.WriteLine("Quitter");
@@ -397,6 +401,38 @@ namespace ExempleMVVM.Modules
                 }
 
             }
+        }
+
+        /// <summary>
+        /// Appelerpour débuter une conversation privée avec un utilisateur en ayant fait
+        /// la demande.
+        /// </summary>
+        /// <param name="envoyeur">EndPoint de l'envoyeur</param>
+        /// <param name="message">Message reçu, sans l'entête</param>
+        public static async void RecevoirDemandeConversationPrivee(EndPoint envoyeur, string message)
+        {
+            Utilisateur autre = TrouverUtilisateurSelonEndPoint(envoyeur);
+
+            Conversation nouvelleConversation = new Conversation();
+            nouvelleConversation.Utilisateur = autre;
+            nouvelleConversation.EstGlobale = false;
+
+            string stringPort = message.Substring(0, 4);
+            string stringCle = message.Substring(4); //Du cinquième quaractère à la fin
+
+            int port = Int32.Parse(stringPort, System.Globalization.NumberStyles.HexNumber);
+
+            nouvelleConversation.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            
+            await Task.Factory.StartNew(() =>
+            {
+                nouvelleConversation.Socket.Connect(IPAddress.Parse(autre.IP), port);
+                nouvelleConversation.Connecte = true;
+            });
+
+            profilApplication.Conversations.Add(nouvelleConversation);
+
+            Recevoir(nouvelleConversation);
         }
 
         /// <summary>
@@ -438,7 +474,9 @@ namespace ExempleMVVM.Modules
             }
             else // Conversation privée
             {
-                byte[] data = Encrypter(messageComplet, conversation.Key);
+                // Pas d'encryption le temps du test
+                //byte[] data = Encrypter(messageComplet, conversation.Key);
+                byte[] data = Encoding.Unicode.GetBytes(messageComplet);
                 await Task.Factory.StartNew(() =>
                 {
                     conversation.Socket.Send(data);
@@ -538,6 +576,20 @@ namespace ExempleMVVM.Modules
         public static async void EnvoyerIdentification(Conversation conversation, EndPoint endpoint)
         {
             Envoyer(endpoint, conversation.Socket, "I" + profilApplication.Nom);
+        }
+
+        /// <summary>
+        /// Envois une demende de conversation privée en indiquant à quel port
+        /// et avec quelle clé communiquer
+        /// </summary>
+        /// <param name="stringCle">Chaine hexadécimale représentant la clé</param>
+        /// <param name="stringPort">Chaine hexadécimale représentant la clé</param>
+        /// <param name="utilisateur">Utilisateur à qui envoyer la demende</param>
+        public static void EnvoyerDemendeConversationPrivee(string stringCle, string stringPort, Utilisateur utilisateur)
+        {
+            IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(utilisateur.IP), port);
+
+            Envoyer(endPoint, conversationGlobale.Socket, "P" + stringPort + stringCle);
         }
 
         #endregion Envois
