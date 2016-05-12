@@ -25,43 +25,61 @@ namespace ExempleMVVM.Modules
         #region Public Methods
 
         /// <summary>
-        /// Représente le chat global
+        /// Représente le chat global.
         /// </summary>
         public static Conversation conversationGlobale;
 
         /// <summary>
-        /// Profil utilisé par l'application
+        /// Profil utilisé par l'application.
         /// </summary>
         public static Profil profilApplication;
 
         /// <summary>
-        /// Port utilisé pour le chat global
+        /// Port utilisé pour le chat global.
         /// </summary>
         public const int port = 50000;
 
         /// <summary>
-        /// Met ton adresse IP dans une liste
+        /// Met ton adresse IP dans une liste.
         /// </summary>
         private static List<IPAddress> mesAdresse = new List<IPAddress>();
 
         /// <summary>
-        /// Met un bool à True ou False dépendant du fait ou l'application écoute ou non
+        /// Met un bool à True ou False dépendant du fait ou l'application écoute ou non.
         /// </summary>
         private static bool enEcoute;
 
         /// <summary>
-        /// Fait une liste d'utilisateurs afin de pouvoir rafraichir la liste
+        /// Fait une liste d'utilisateurs afin de pouvoir rafraichir la liste.
         /// </summary>
         private static List<Utilisateur> utilisateurTemp = new List<Utilisateur>();
 
+        /// <summary>
+        /// Fait une liste d'utilisateur à supprimer dans la fonction
+        /// "RafraichirListeUtilisateursConnectes".
+        /// </summary>
         private static List<Utilisateur> listeASupprimer = new List<Utilisateur>();
 
+        /// <summary>
+        /// Prend les éléments de la listeASupprimer et les mets dans la liste "utilisateurASupprimer".
+        /// </summary>
         private static List<Utilisateur> utilisateurASupprimer = new List<Utilisateur>();
 
+        /// <summary>
+        /// Prend les utilisateurs dans la liste temporaire "utilisateurTemp" et les mets dans la liste
+        /// "utilisateurAAjouter".
+        /// </summary>
         private static List<Utilisateur> utilisateurAAjouter = new List<Utilisateur>();
 
+        /// <summary>
+        /// Prend tous les nouveaux utilisateurs dans la liste "utilisateurAAjouter" et les mets dans la liste d'utilisateur
+        /// connecté sur le moment.
+        /// </summary>
         private static List<Utilisateur> nouvelUtilisateur = new List<Utilisateur>();
 
+        /// <summary>
+        /// Un objet utilisé pour obtenir un chiffre de façon aléatoire.
+        /// </summary>
         private static Random random = new Random();
 
         /// <summary>
