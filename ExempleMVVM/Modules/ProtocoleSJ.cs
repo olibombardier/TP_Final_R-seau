@@ -153,9 +153,38 @@ namespace ExempleMVVM.Modules
         /// Permet d'ouvrir un port TCP et d'envoyer par UDP une demande de connexion en privée à l'utilisateur distant
         /// </summary>
         /// <param name="nouvelleConversation">Conversation privée contenant l'utilisateur distant</param>
-        public static void DemarrerConversationPrivee(Conversation nouvelleConversation)
+        public static async void DemarrerConversationPrivee(Conversation nouvelleConversation)
         {
-            throw new NotImplementedException();
+            byte[] cle = new byte[128];
+            StringBuilder stringBuilderCle = new StringBuilder();
+            short port = 0;
+
+            random.NextBytes(cle);
+            nouvelleConversation.Key = cle;
+
+            Socket socketEcoute = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            socketEcoute.Bind(new IPEndPoint(IPAddress.Any, 0));
+            socketEcoute.Listen(1);
+            port = (short)((IPEndPoint)socketEcoute.LocalEndPoint).Port;
+
+            foreach (byte b in cle)
+            {
+                stringBuilderCle.Append(String.Format("{0:x2}", b));
+            }
+
+            // TODO envoyer
+
+            // test
+            LigneConversation test = new LigneConversation();
+            test.Message = String.Format("{0:x4} {1}", port, stringBuilderCle.ToString());
+            nouvelleConversation.Lignes.Add(test);
+            //
+
+            await Task.Factory.StartNew(() =>
+                {
+                    nouvelleConversation.Socket = socketEcoute.Accept();
+                });
+            socketEcoute.Close();
         }
 
         /// <summary>
@@ -216,7 +245,7 @@ namespace ExempleMVVM.Modules
         /// <param name="conversation">Conversation à fermer</param>
         public static void TerminerConversationPrivee(Conversation conversation)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
 
@@ -509,17 +538,6 @@ namespace ExempleMVVM.Modules
         public static async void EnvoyerIdentification(Conversation conversation, EndPoint endpoint)
         {
             Envoyer(endpoint, conversation.Socket, "I" + profilApplication.Nom);
-        }
-
-        /// <summary>
-        /// Indique à l'autre utilisateur qu'on a ouvert un port et on attend un conversation privée
-        /// </summary>
-        /// <param name="conversationGlobale">Conversation globale</param>
-        public static async void EnvoyerDemendeConversationPrivee(Conversation conversationGlobale)
-        {
-            byte[] cle = new byte[128];
-
-            random.NextBytes(cle);
         }
 
         #endregion Envois
