@@ -379,7 +379,7 @@ namespace ExempleMVVM.Modules
                 }
                 else
                 {
-                    message = Decrypter(data, conversation.Key);
+                    message = Decrypter(data, byteRead, conversation.Key);
                 }
 
                 if (byteRead > 0)
@@ -621,11 +621,11 @@ namespace ExempleMVVM.Modules
             byte[] IV = new byte[16]; // IV de 0 pour que ça fonctionne
             for (int i = 0; i < 16; i++)
             {
-                IV[i] = 0;
+                IV[i] = 2;
             }
             aes.IV = IV;
 
-            ICryptoTransform encrypteur = aes.CreateEncryptor();
+            ICryptoTransform encrypteur = aes.CreateEncryptor(aes.Key, aes.IV);
             using (MemoryStream memoryStream = new MemoryStream(resultat))
             {
                 using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encrypteur, CryptoStreamMode.Write))
@@ -644,10 +644,12 @@ namespace ExempleMVVM.Modules
         /// <param name="message"> Message à décoder </param>
         /// <param name="cle"> Clé servant à décoder le message </param>
         /// <returns> Retourne les octets décodé sous une forme de message </returns>
-        public static string Decrypter(byte[] message, byte[] cle)
+        public static string Decrypter(byte[] message, int size, byte[] cle)
         {
-            string resultat = null;
+            char[] buffer = new char[1024];
             Aes aes = Aes.Create();
+            int charRead = 0;
+            string resultat = "";
 
             if (cle.Length != 16)
             {
@@ -658,20 +660,25 @@ namespace ExempleMVVM.Modules
             byte[] IV = new byte[16]; // IV de 0 pour que ça fonctionne
             for (int i = 0; i < 16; i++)
             {
-                IV[i] = 0;
+                IV[i] = 2;
             }
             aes.IV = IV;
 
-            ICryptoTransform decrypteur = aes.CreateDecryptor();
+            ICryptoTransform decrypteur = aes.CreateDecryptor(aes.Key, aes.IV);
             using (MemoryStream memoryStream = new MemoryStream(message))
             {
                 using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decrypteur, CryptoStreamMode.Read))
                 {
                     using (StreamReader streamReader = new StreamReader(cryptoStream, Encoding.Unicode))
                     {
-                        resultat = streamReader.ReadToEnd();
+                        charRead = streamReader.Read(buffer,0,size);
                     }
                 }
+            }
+
+            for (int i = 0; i < charRead; i++)
+            {
+                resultat += buffer[i];
             }
             return resultat;
         }
