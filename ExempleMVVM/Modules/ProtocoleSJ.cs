@@ -250,6 +250,22 @@ namespace ExempleMVVM.Modules
         /// <param name="conversation">Conversation à fermer</param>
         public static void TerminerConversationPrivee(Conversation conversation)
         {
+            Envoyer(conversation, "Q");
+
+            conversation.Socket.Shutdown(SocketShutdown.Both);
+            conversation.Socket.Close();
+            conversation.Connecte = false;
+            profilApplication.Conversations.Remove(conversation);
+        }
+
+        /// <summary>
+        /// Ferme la conversation privée après qu'elle est étée quittée par l'autre
+        /// utilisateur.
+        /// </summary>
+        /// <param name="conversation">Converstaion terminée</param>
+        public static void RecevoirFinConversationPrivee(Conversation conversation)
+        {
+            conversation.Socket.Shutdown(SocketShutdown.Both);
             conversation.Socket.Close();
             conversation.Connecte = false;
             profilApplication.Conversations.Remove(conversation);
@@ -410,7 +426,7 @@ namespace ExempleMVVM.Modules
                         RecevoirDemandeConversationPrivee(otherEndPoint, message.Substring(4));
                         break;
                     case 'Q':
-                        System.Diagnostics.Debug.WriteLine("Quitter");
+                        TerminerConversationPrivee(conversation);
                         break;
                 }
             }
