@@ -618,6 +618,12 @@ namespace ExempleMVVM.Modules
             }
 
             aes.Key = cle;
+            byte[] IV = new byte[16]; // IV de 0 pour que ça fonctionne
+            for (int i = 0; i < 16; i++)
+            {
+                IV[i] = 0;
+            }
+            aes.IV = IV;
 
             ICryptoTransform encrypteur = aes.CreateEncryptor();
             using (MemoryStream memoryStream = new MemoryStream(resultat))
@@ -649,6 +655,12 @@ namespace ExempleMVVM.Modules
             }
 
             aes.Key = cle;
+            byte[] IV = new byte[16]; // IV de 0 pour que ça fonctionne
+            for (int i = 0; i < 16; i++)
+            {
+                IV[i] = 0;
+            }
+            aes.IV = IV;
 
             ICryptoTransform decrypteur = aes.CreateDecryptor();
             using (MemoryStream memoryStream = new MemoryStream(message))
