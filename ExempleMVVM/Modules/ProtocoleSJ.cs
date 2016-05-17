@@ -54,28 +54,7 @@ namespace ExempleMVVM.Modules
         /// </summary>
         private static List<Utilisateur> utilisateurTemp = new List<Utilisateur>();
 
-        /// <summary>
-        /// Fait une liste d'utilisateur à supprimer dans la fonction
-        /// "RafraichirListeUtilisateursConnectes".
-        /// </summary>
-        private static List<Utilisateur> listeASupprimer = new List<Utilisateur>();
 
-        /// <summary>
-        /// Prend les éléments de la listeASupprimer et les mets dans la liste "utilisateurASupprimer".
-        /// </summary>
-        private static List<Utilisateur> utilisateurASupprimer = new List<Utilisateur>();
-
-        /// <summary>
-        /// Prend les utilisateurs dans la liste temporaire "utilisateurTemp" et les mets dans la liste
-        /// "utilisateurAAjouter".
-        /// </summary>
-        private static List<Utilisateur> utilisateurAAjouter = new List<Utilisateur>();
-
-        /// <summary>
-        /// Prend tous les nouveaux utilisateurs dans la liste "utilisateurAAjouter" et les mets dans la liste d'utilisateur
-        /// connecté sur le moment.
-        /// </summary>
-        private static List<Utilisateur> nouvelUtilisateur = new List<Utilisateur>();
 
         /// <summary>
         /// Un objet utilisé pour obtenir un chiffre de façon aléatoire.
@@ -235,6 +214,7 @@ namespace ExempleMVVM.Modules
             {
                 EnvoyerDiscovery();
                 await Task.Delay(5000);
+                List<Utilisateur> listeASupprimer = new List<Utilisateur>();
 
                 foreach (Utilisateur vieuxUtilisateur in profilApplication.UtilisateursConnectes)
                 {
