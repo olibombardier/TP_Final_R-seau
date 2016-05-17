@@ -381,8 +381,7 @@ namespace ExempleMVVM.Modules
                 {
                     if (byteRead > 0)
                     {
-                        // -4 pour la taille du header
-                        message = Decrypter(data, byteRead - 4, conversation.Key);
+                        message = Decrypter(data, byteRead, conversation.Key);
                     }
                 }
 
@@ -639,6 +638,7 @@ namespace ExempleMVVM.Modules
                     byte[] data = Encoding.Unicode.GetBytes(message);
                     bufferSize = data.Length;
                     cryptoStream.Write(data, 0, data.Length);
+                    cryptoStream.FlushFinalBlock();
                 }
             }
 
