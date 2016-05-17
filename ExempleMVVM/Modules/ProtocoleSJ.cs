@@ -131,7 +131,11 @@ namespace ExempleMVVM.Modules
 
             foreach (Utilisateur utilisateur in utilisateurTemp)
             {
-                profilApplication.UtilisateursConnectes.Add(utilisateur);
+                if(!profilApplication.UtilisateursConnectes.Any( 
+                    u => u.Nom == utilisateur.Nom && u.IP == utilisateur.IP))
+                {
+                    profilApplication.UtilisateursConnectes.Add(utilisateur);
+                }
             }
 
             utilisateurTemp.Clear();
