@@ -274,6 +274,9 @@ namespace ExempleMVVM.Modules
         /// <summary>
         /// Permet de recevoir un message en mode global
         /// </summary>
+        /// <param name="conversation"> La conversation ou le paquet sera envoyé </param>
+        /// <param name="message"> Le message qui est envoyé dans le paquet </param>
+        /// <param name="endPoint"> L'adresse IP qui envoies le paquet </param>
         public static void RecevoirMessage(Conversation conversation, string message, EndPoint endPoint)
         {
             Utilisateur envoyeur;
@@ -322,6 +325,7 @@ namespace ExempleMVVM.Modules
         /// <summary>
         /// Permet de recevoir l'adresse IP ainsi que le Nom de l'utilisateur.
         /// </summary>
+        /// <param name="conversation"> Reçoit le paquet dans la conversation </param>
         public static async void Recevoir(Conversation conversation)
         {
             enEcoute = true;
@@ -335,6 +339,7 @@ namespace ExempleMVVM.Modules
                 EndPoint otherEndPoint = new IPEndPoint(IPAddress.Any, 0);
                 LigneConversation messageErreur = null;
 
+                //
                 await Task.Factory.StartNew(() =>
                 {
                     try
@@ -417,9 +422,10 @@ namespace ExempleMVVM.Modules
         }
 
         /// <summary>
-        /// Reçois l'idetification d'un utilisateur
+        /// Reçoit l'identification d'un utilisateur
         /// </summary>
-        /// <param name="endpoint"></param>
+        /// <param name="endpoint"> Reçoit l'adresse IP de l'envoyeur </param>
+        /// <param name="message"> Reçoit le message de l'envoyeur </param>
         public static void RecevoirIdentification(IPEndPoint endpoint, string message)
         {
             string nom = message.Substring(4);
@@ -489,11 +495,10 @@ namespace ExempleMVVM.Modules
 
         /// <summary>
         /// Envois un message en UDP ou TCP selon la conversation et l'encrypte
-        /// si nécessaire
+        /// si nécessaire 
         /// </summary>
-        /// <param name="ipDestinataire"></param>
-        /// <param name="conversation">Conversation à laquelle envoyer le message</param>
-        /// <param name="message">Message à envoyer</param>
+        /// <param name="conversation"> Conversation à laquelle envoyer le message </param>
+        /// <param name="message"> Message à envoyer </param>
         public static async void Envoyer(Conversation conversation, string message)
         {
             string messageComplet = "TPR" + message;
@@ -576,6 +581,13 @@ namespace ExempleMVVM.Modules
             return broadcasts;
         }
 
+
+        /// <summary>
+        /// Fonction servant à encoder une clé et les messages qui seront envoyés en TCP
+        /// </summary>
+        /// <param name="message"> Prend le message qui sera encodé à l'aide d'une clé aes </param>
+        /// <param name="cle"> Clé Aes qui servira à encoder les messages </param>
+        /// <returns></returns>
         public static byte[] Encrypter(string message, byte[] cle)
         {
             byte[] resultat = new byte[1024];
@@ -600,6 +612,13 @@ namespace ExempleMVVM.Modules
             return resultat;
         }
 
+
+        /// <summary>
+        /// Fonction servant à décoder un message à l'aide d'une clé aes lors de conversation privée
+        /// </summary>
+        /// <param name="message"> Message à décoder </param>
+        /// <param name="cle"> Clé servant à décoder le message </param>
+        /// <returns></returns>
         public static string Decrypter(byte[] message, byte[] cle)
         {
             string resultat = null;
@@ -637,7 +656,7 @@ namespace ExempleMVVM.Modules
         /// <summary>
         /// Envois le nom de l'utilisateur à la conversation fournie
         /// </summary>
-        /// <param name="conversation"></param>
+        /// <param name="conversation"> La conversation ou sera envoyé l'identification </param>
         public static async void EnvoyerIdentification(Conversation conversation, EndPoint endpoint)
         {
             Envoyer(endpoint, conversation.Socket, "I" + profilApplication.Nom);
