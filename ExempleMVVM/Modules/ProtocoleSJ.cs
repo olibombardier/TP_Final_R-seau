@@ -372,14 +372,18 @@ namespace ExempleMVVM.Modules
                         messageErreur.Utilisateur = new Utilisateur() { IP = "Erreur" };
                     }
                 });
-                string message;
+                string message = "";
                 if (conversation.EstGlobale)
                 {
                     message = Encoding.Unicode.GetString(data, 0, byteRead);
                 }
                 else
                 {
-                    message = Decrypter(data, byteRead, conversation.Key);
+                    if (byteRead > 0)
+                    {
+                        // -4 pour la taille du header
+                        message = Decrypter(data, byteRead - 4, conversation.Key);
+                    }
                 }
 
                 if (byteRead > 0)
@@ -609,8 +613,10 @@ namespace ExempleMVVM.Modules
         /// <returns> Retourne les octets du message enncodé </returns>
         public static byte[] Encrypter(string message, byte[] cle)
         {
-            byte[] resultat = new byte[1024];
+            byte[] resultat;
+            byte[] temporaire = new byte[1024];
             Aes aes = Aes.Create();
+            int bufferSize = 0;
 
             if (cle.Length != 16)
             {
@@ -626,14 +632,22 @@ namespace ExempleMVVM.Modules
             aes.IV = IV;
 
             ICryptoTransform encrypteur = aes.CreateEncryptor(aes.Key, aes.IV);
-            using (MemoryStream memoryStream = new MemoryStream(resultat))
+            using (MemoryStream memoryStream = new MemoryStream(temporaire))
             {
                 using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encrypteur, CryptoStreamMode.Write))
                 {
                     byte[] data = Encoding.Unicode.GetBytes(message);
+                    bufferSize = data.Length;
                     cryptoStream.Write(data, 0, data.Length);
                 }
             }
+
+            resultat = new byte[bufferSize];
+            for (int i = 0; i < bufferSize; i++)
+            {
+                resultat[i] = temporaire[i];
+            }
+
             return resultat;
         }
 
