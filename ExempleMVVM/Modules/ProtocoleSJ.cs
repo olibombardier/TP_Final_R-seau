@@ -131,7 +131,7 @@ namespace ExempleMVVM.Modules
 
             foreach (Utilisateur utilisateur in utilisateurTemp)
             {
-                if(!profilApplication.UtilisateursConnectes.Any( 
+                if (!profilApplication.UtilisateursConnectes.Any(
                     u => u.Nom == utilisateur.Nom && u.IP == utilisateur.IP))
                 {
                     profilApplication.UtilisateursConnectes.Add(utilisateur);
@@ -158,15 +158,18 @@ namespace ExempleMVVM.Modules
         /// </summary>
         public static void Deconnexion()
         {
-            foreach (Conversation c in profilApplication.Conversations)
+            if (profilApplication != null && profilApplication.Connecte)
             {
-                if (c.EstPrivee)
+                foreach (Conversation c in profilApplication.Conversations)
                 {
-                    TerminerConversationPrivee(c);
-                }
-                else
-                {
-                    c.Socket.Close();
+                    if (c.EstPrivee)
+                    {
+                        TerminerConversationPrivee(c);
+                    }
+                    else
+                    {
+                        c.Socket.Close();
+                    }
                 }
             }
         }
