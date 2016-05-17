@@ -288,7 +288,7 @@ namespace ExempleMVVM.Modules
             {
                 envoyeur = conversation.Utilisateur;
             }
-            
+
             IPAddress adresse = ((IPEndPoint)endPoint).Address;
             if (!EstMonAdresse(adresse))
             {
@@ -371,7 +371,15 @@ namespace ExempleMVVM.Modules
                         messageErreur.Utilisateur = new Utilisateur() { IP = "Erreur" };
                     }
                 });
-                string message = Encoding.Unicode.GetString(data, 0, byteRead);
+                string message;
+                if (conversation.EstGlobale)
+                {
+                    message = Encoding.Unicode.GetString(data, 0, byteRead);
+                }
+                else
+                {
+                    message = Decrypter(data, conversation.Key);
+                }
 
                 if (byteRead > 0)
                 {
@@ -518,9 +526,7 @@ namespace ExempleMVVM.Modules
             }
             else // Conversation privée
             {
-                // Pas d'encryption le temps du test
-                //byte[] data = Encrypter(messageComplet, conversation.Key);
-                byte[] data = Encoding.Unicode.GetBytes(messageComplet);
+                byte[] data = Encrypter(messageComplet, conversation.Key);
                 await Task.Factory.StartNew(() =>
                 {
                     conversation.Socket.Send(data);
@@ -636,7 +642,7 @@ namespace ExempleMVVM.Modules
             {
                 using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decrypteur, CryptoStreamMode.Read))
                 {
-                    using (StreamReader streamReader = new StreamReader(cryptoStream))
+                    using (StreamReader streamReader = new StreamReader(cryptoStream, Encoding.Unicode))
                     {
                         resultat = streamReader.ReadToEnd();
                     }
