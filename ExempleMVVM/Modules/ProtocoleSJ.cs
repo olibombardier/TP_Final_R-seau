@@ -625,7 +625,7 @@ namespace ExempleMVVM.Modules
             }
             aes.IV = IV;
 
-            ICryptoTransform encrypteur = aes.CreateEncryptor();
+            ICryptoTransform encrypteur = aes.CreateEncryptor(aes.Key, aes.IV);
             using (MemoryStream memoryStream = new MemoryStream(resultat))
             {
                 using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encrypteur, CryptoStreamMode.Write))
@@ -662,7 +662,7 @@ namespace ExempleMVVM.Modules
             }
             aes.IV = IV;
 
-            ICryptoTransform decrypteur = aes.CreateDecryptor();
+            ICryptoTransform decrypteur = aes.CreateDecryptor(aes.Key, aes.IV);
             using (MemoryStream memoryStream = new MemoryStream(message))
             {
                 using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decrypteur, CryptoStreamMode.Read))
