@@ -613,9 +613,7 @@ namespace ExempleMVVM.Modules
         public static byte[] Encrypter(string message, byte[] cle)
         {
             byte[] resultat;
-            byte[] temporaire = new byte[1024];
             Aes aes = Aes.Create();
-            int bufferSize = 0;
 
             if (cle.Length != 16)
             {
@@ -631,21 +629,15 @@ namespace ExempleMVVM.Modules
             aes.IV = IV;
 
             ICryptoTransform encrypteur = aes.CreateEncryptor(aes.Key, aes.IV);
-            using (MemoryStream memoryStream = new MemoryStream(temporaire))
+            using (MemoryStream memoryStream = new MemoryStream())
             {
                 using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encrypteur, CryptoStreamMode.Write))
                 {
                     byte[] data = Encoding.Unicode.GetBytes(message);
-                    bufferSize = data.Length;
                     cryptoStream.Write(data, 0, data.Length);
                     cryptoStream.FlushFinalBlock();
+                    resultat = memoryStream.ToArray();
                 }
-            }
-
-            resultat = new byte[bufferSize];
-            for (int i = 0; i < bufferSize; i++)
-            {
-                resultat[i] = temporaire[i];
             }
 
             return resultat;
@@ -679,8 +671,10 @@ namespace ExempleMVVM.Modules
             aes.IV = IV;
 
             ICryptoTransform decrypteur = aes.CreateDecryptor(aes.Key, aes.IV);
-            using (MemoryStream memoryStream = new MemoryStream(message))
+            using (MemoryStream memoryStream = new MemoryStream())
             {
+                memoryStream.Write(message, 0, size);
+                memoryStream.Seek(0, SeekOrigin.Begin);
                 using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decrypteur, CryptoStreamMode.Read))
                 {
                     using (StreamReader streamReader = new StreamReader(cryptoStream, Encoding.Unicode))
