@@ -339,9 +339,9 @@ namespace ExempleMVVM.Modules
                 EndPoint otherEndPoint = new IPEndPoint(IPAddress.Any, 0);
                 LigneConversation messageErreur = null;
 
-                //
                 await Task.Factory.StartNew(() =>
                 {
+                    // Essaies de lire le message
                     try
                     {
                         if (conversation.Socket.Poll(500, SelectMode.SelectRead))
