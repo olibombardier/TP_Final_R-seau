@@ -461,9 +461,18 @@ namespace ExempleMVVM.Modules
             string stringCle = message.Substring(4); //Du cinquième quaractère à la fin
 
             int port = Int32.Parse(stringPort, System.Globalization.NumberStyles.HexNumber);
+            byte[] cle = new byte[16];
 
             nouvelleConversation.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
+            // Trouver la clé
+            for (int i = 0; i < 16; i++)
+            {
+                cle[i] = byte.Parse(stringCle.Substring(i * 2, 2), System.Globalization.NumberStyles.HexNumber);
+            }
+            nouvelleConversation.Key = cle;
+
+            // Connection à l'autre utilisateur sur le port indiqué
             await Task.Factory.StartNew(() =>
             {
                 nouvelleConversation.Socket.Connect(IPAddress.Parse(autre.IP), port);
@@ -586,7 +595,7 @@ namespace ExempleMVVM.Modules
             byte[] resultat = new byte[1024];
             Aes aes = Aes.Create();
 
-            if (cle.Length != 128)
+            if (cle.Length != 16)
             {
                 throw new ArgumentException("La clé doit être de 128 bits");
             }
@@ -617,7 +626,7 @@ namespace ExempleMVVM.Modules
             string resultat = null;
             Aes aes = Aes.Create();
 
-            if (cle.Length != 128)
+            if (cle.Length != 16)
             {
                 throw new ArgumentException("La clé doit être de 128 bits");
             }
