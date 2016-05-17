@@ -255,7 +255,6 @@ namespace ExempleMVVM.Modules
             conversation.Socket.Shutdown(SocketShutdown.Both);
             conversation.Socket.Close();
             conversation.Connecte = false;
-            profilApplication.Conversations.Remove(conversation);
         }
 
         /// <summary>
@@ -268,7 +267,6 @@ namespace ExempleMVVM.Modules
             conversation.Socket.Shutdown(SocketShutdown.Both);
             conversation.Socket.Close();
             conversation.Connecte = false;
-            profilApplication.Conversations.Remove(conversation);
         }
 
 
@@ -395,7 +393,10 @@ namespace ExempleMVVM.Modules
                     messageErreur = null;
                 }
             }
-            System.Diagnostics.Debug.WriteLine("Recevoir fini");
+            if (conversation.EstPrivee)
+            {
+                profilApplication.Conversations.Remove(conversation);
+            }
         }
 
         /// <summary>
