@@ -381,8 +381,7 @@ namespace ExempleMVVM.Modules
                 {
                     if (byteRead > 0)
                     {
-                        // -4 pour la taille du header
-                        message = Decrypter(data, byteRead - 4, conversation.Key);
+                        message = Decrypter(data, byteRead, conversation.Key);
                     }
                 }
 
