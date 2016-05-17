@@ -54,28 +54,7 @@ namespace ExempleMVVM.Modules
         /// </summary>
         private static List<Utilisateur> utilisateurTemp = new List<Utilisateur>();
 
-        /// <summary>
-        /// Fait une liste d'utilisateur à supprimer dans la fonction
-        /// "RafraichirListeUtilisateursConnectes".
-        /// </summary>
-        private static List<Utilisateur> listeASupprimer = new List<Utilisateur>();
 
-        /// <summary>
-        /// Prend les éléments de la listeASupprimer et les mets dans la liste "utilisateurASupprimer".
-        /// </summary>
-        private static List<Utilisateur> utilisateurASupprimer = new List<Utilisateur>();
-
-        /// <summary>
-        /// Prend les utilisateurs dans la liste temporaire "utilisateurTemp" et les mets dans la liste
-        /// "utilisateurAAjouter".
-        /// </summary>
-        private static List<Utilisateur> utilisateurAAjouter = new List<Utilisateur>();
-
-        /// <summary>
-        /// Prend tous les nouveaux utilisateurs dans la liste "utilisateurAAjouter" et les mets dans la liste d'utilisateur
-        /// connecté sur le moment.
-        /// </summary>
-        private static List<Utilisateur> nouvelUtilisateur = new List<Utilisateur>();
 
         /// <summary>
         /// Un objet utilisé pour obtenir un chiffre de façon aléatoire.
@@ -131,7 +110,11 @@ namespace ExempleMVVM.Modules
 
             foreach (Utilisateur utilisateur in utilisateurTemp)
             {
-                profilApplication.UtilisateursConnectes.Add(utilisateur);
+                if (!profilApplication.UtilisateursConnectes.Any(
+                    u => u.Nom == utilisateur.Nom && u.IP == utilisateur.IP))
+                {
+                    profilApplication.UtilisateursConnectes.Add(utilisateur);
+                }
             }
 
             utilisateurTemp.Clear();
@@ -154,15 +137,18 @@ namespace ExempleMVVM.Modules
         /// </summary>
         public static void Deconnexion()
         {
-            foreach (Conversation c in profilApplication.Conversations)
+            if (profilApplication != null && profilApplication.Connecte)
             {
-                if (c.EstPrivee)
+                foreach (Conversation c in profilApplication.Conversations)
                 {
-                    TerminerConversationPrivee(c);
-                }
-                else
-                {
-                    c.Socket.Close();
+                    if (c.EstPrivee)
+                    {
+                        TerminerConversationPrivee(c);
+                    }
+                    else
+                    {
+                        c.Socket.Close();
+                    }
                 }
             }
         }
@@ -228,6 +214,7 @@ namespace ExempleMVVM.Modules
             {
                 EnvoyerDiscovery();
                 await Task.Delay(5000);
+                List<Utilisateur> listeASupprimer = new List<Utilisateur>();
 
                 foreach (Utilisateur vieuxUtilisateur in profilApplication.UtilisateursConnectes)
                 {
@@ -263,9 +250,23 @@ namespace ExempleMVVM.Modules
         /// <param name="conversation">Conversation à fermer</param>
         public static void TerminerConversationPrivee(Conversation conversation)
         {
+            Envoyer(conversation, "Q");
+
+            conversation.Socket.Shutdown(SocketShutdown.Both);
             conversation.Socket.Close();
             conversation.Connecte = false;
-            profilApplication.Conversations.Remove(conversation);
+        }
+
+        /// <summary>
+        /// Ferme la conversation privée après qu'elle est étée quittée par l'autre
+        /// utilisateur.
+        /// </summary>
+        /// <param name="conversation">Converstaion terminée</param>
+        public static void RecevoirFinConversationPrivee(Conversation conversation)
+        {
+            conversation.Socket.Shutdown(SocketShutdown.Both);
+            conversation.Socket.Close();
+            conversation.Connecte = false;
         }
 
 
@@ -392,7 +393,10 @@ namespace ExempleMVVM.Modules
                     messageErreur = null;
                 }
             }
-            System.Diagnostics.Debug.WriteLine("Recevoir fini");
+            if (conversation.EstPrivee)
+            {
+                profilApplication.Conversations.Remove(conversation);
+            }
         }
 
         /// <summary>
@@ -423,7 +427,7 @@ namespace ExempleMVVM.Modules
                         RecevoirDemandeConversationPrivee(otherEndPoint, message.Substring(4));
                         break;
                     case 'Q':
-                        System.Diagnostics.Debug.WriteLine("Quitter");
+                        TerminerConversationPrivee(conversation);
                         break;
                 }
             }
@@ -474,9 +478,18 @@ namespace ExempleMVVM.Modules
             string stringCle = message.Substring(4); //Du cinquième quaractère à la fin
 
             int port = Int32.Parse(stringPort, System.Globalization.NumberStyles.HexNumber);
+            byte[] cle = new byte[16];
 
             nouvelleConversation.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
+            // Trouver la clé
+            for (int i = 0; i < 16; i++)
+            {
+                cle[i] = byte.Parse(stringCle.Substring(i * 2, 2), System.Globalization.NumberStyles.HexNumber);
+            }
+            nouvelleConversation.Key = cle;
+
+            // Connection à l'autre utilisateur sur le port indiqué
             await Task.Factory.StartNew(() =>
             {
                 nouvelleConversation.Socket.Connect(IPAddress.Parse(autre.IP), port);
@@ -599,7 +612,7 @@ namespace ExempleMVVM.Modules
             byte[] resultat = new byte[1024];
             Aes aes = Aes.Create();
 
-            if (cle.Length != 128)
+            if (cle.Length != 16)
             {
                 throw new ArgumentException("La clé doit être de 128 bits");
             }
@@ -630,7 +643,7 @@ namespace ExempleMVVM.Modules
             string resultat = null;
             Aes aes = Aes.Create();
 
-            if (cle.Length != 128)
+            if (cle.Length != 16)
             {
                 throw new ArgumentException("La clé doit être de 128 bits");
             }
