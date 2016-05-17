@@ -638,6 +638,7 @@ namespace ExempleMVVM.Modules
                     byte[] data = Encoding.Unicode.GetBytes(message);
                     bufferSize = data.Length;
                     cryptoStream.Write(data, 0, data.Length);
+                    cryptoStream.FlushFinalBlock();
                 }
             }
 
