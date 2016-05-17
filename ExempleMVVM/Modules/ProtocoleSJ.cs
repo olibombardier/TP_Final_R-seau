@@ -587,7 +587,7 @@ namespace ExempleMVVM.Modules
         /// </summary>
         /// <param name="message"> Prend le message qui sera encodé à l'aide d'une clé aes </param>
         /// <param name="cle"> Clé Aes qui servira à encoder les messages </param>
-        /// <returns></returns>
+        /// <returns> Retourne les octets du message enncodé </returns>
         public static byte[] Encrypter(string message, byte[] cle)
         {
             byte[] resultat = new byte[1024];
@@ -618,7 +618,7 @@ namespace ExempleMVVM.Modules
         /// </summary>
         /// <param name="message"> Message à décoder </param>
         /// <param name="cle"> Clé servant à décoder le message </param>
-        /// <returns></returns>
+        /// <returns> Retourne les octets décodé sous une forme de message </returns>
         public static string Decrypter(byte[] message, byte[] cle)
         {
             string resultat = null;
