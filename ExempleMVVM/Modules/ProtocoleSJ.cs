@@ -217,10 +217,12 @@ namespace ExempleMVVM.Modules
         {
             while (profilApplication.Connecte)
             {
+                // Envoit un discovery
                 EnvoyerDiscovery();
                 await Task.Delay(5000);
                 List<Utilisateur> listeASupprimer = new List<Utilisateur>();
 
+                // Trouver les utilisateurs qui se sont ajouté ou sont partis
                 foreach (Utilisateur vieuxUtilisateur in profilApplication.UtilisateursConnectes)
                 {
                     Utilisateur utilisateur = utilisateurTemp.Find((u) =>
@@ -235,11 +237,13 @@ namespace ExempleMVVM.Modules
                     }
                 }
 
+                // Supprimme les utilisateurs ayant quittés
                 foreach (Utilisateur utilisateurASupprimer in listeASupprimer)
                 {
                     profilApplication.UtilisateursConnectes.Remove(utilisateurASupprimer);
                 }
 
+                // Ajoute les nouveaux utilisateurs
                 foreach (Utilisateur utilisateurAAjouter in utilisateurTemp)
                 {
                     profilApplication.UtilisateursConnectes.Add(utilisateurAAjouter);
@@ -255,7 +259,7 @@ namespace ExempleMVVM.Modules
         /// <param name="conversation">Conversation à fermer</param>
         public static void TerminerConversationPrivee(Conversation conversation)
         {
-            //Envoyer(conversation, "Q");
+            Envoyer(conversation, "Q");
 
             conversation.Socket.Shutdown(SocketShutdown.Both);
             conversation.Socket.Close();
