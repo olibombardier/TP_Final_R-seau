@@ -164,24 +164,28 @@ namespace ExempleMVVM.Modules
             short port = 0;
             string stringCle, stringPort;
 
+            // Création de la clé
             random.NextBytes(cle);
             nouvelleConversation.Key = cle;
 
+            // Ouverture du socket
             Socket socketEcoute = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socketEcoute.Bind(new IPEndPoint(IPAddress.Any, 0));
             socketEcoute.Listen(1);
             port = (short)((IPEndPoint)socketEcoute.LocalEndPoint).Port;
 
+            // Mettre la clé et le port en string
             foreach (byte b in cle)
             {
                 stringBuilderCle.Append(String.Format("{0:x2}", b));
             }
-
             stringCle = stringBuilderCle.ToString();
             stringPort = String.Format("{0:x4}", port);
 
+            // Envois des informations à l'autre utilisateur
             EnvoyerDemendeConversationPrivee(stringCle, stringPort, nouvelleConversation.Utilisateur);
 
+            // Attente de la connection de l'autre utilisateur
             await Task.Factory.StartNew(() =>
                 {
                     nouvelleConversation.Socket = socketEcoute.Accept();
@@ -189,6 +193,7 @@ namespace ExempleMVVM.Modules
                 });
             socketEcoute.Close();
 
+            // Commence à écouter l'autre utilisateur
             Recevoir(nouvelleConversation);
         }
 
