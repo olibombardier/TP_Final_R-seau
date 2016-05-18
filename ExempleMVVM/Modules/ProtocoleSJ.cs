@@ -372,6 +372,7 @@ namespace ExempleMVVM.Modules
                         messageErreur.Utilisateur = new Utilisateur() { IP = "Erreur" };
                     }
                 });
+                // Prend le message et l'encode ou le décode selon l'événement
                 string message = "";
                 if (conversation.EstGlobale)
                 {
@@ -385,6 +386,7 @@ namespace ExempleMVVM.Modules
                     }
                 }
 
+                // Interprete si des données ont été reçues
                 if (byteRead > 0)
                 {
                     Interpreter(conversation, otherEndPoint, message);
@@ -454,6 +456,7 @@ namespace ExempleMVVM.Modules
                     IP = adresse.ToString()
                 };
                 utilisateurTemp.Add(nouvelUtilisateur);
+                // Ajouter le nouvel utilisateur aux utilisateurs connectés s'il n'y est pas déjà
                 if (!profilApplication.UtilisateursConnectes.Any(u =>
                     u.IP == nouvelUtilisateur.IP && u.Nom == nouvelUtilisateur.Nom))
                 {
@@ -532,7 +535,7 @@ namespace ExempleMVVM.Modules
                 byte[] data = Encoding.Unicode.GetBytes(messageComplet);
                 await Task.Factory.StartNew(() =>
                 {
-                    // Envoyer juste au bonne personnes
+                    // Envoyer juste aux bonnes personnes
                     foreach (Utilisateur utilisateur in profilApplication.UtilisateursConnectes)
                     {
                         IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(utilisateur.IP), port);
@@ -612,6 +615,7 @@ namespace ExempleMVVM.Modules
         /// <returns> Retourne les octets du message enncodé </returns>
         public static byte[] Encrypter(string message, byte[] cle)
         {
+            // Initiation de variables
             byte[] resultat;
             Aes aes = Aes.Create();
 
@@ -628,6 +632,7 @@ namespace ExempleMVVM.Modules
             }
             aes.IV = IV;
 
+            // Encryption
             ICryptoTransform encrypteur = aes.CreateEncryptor(aes.Key, aes.IV);
             using (MemoryStream memoryStream = new MemoryStream())
             {
@@ -648,10 +653,12 @@ namespace ExempleMVVM.Modules
         /// Fonction servant à décoder un message à l'aide d'une clé aes lors de conversation privée
         /// </summary>
         /// <param name="message"> Message à décoder </param>
+        /// <param name="size"> Nombre d'octets à décrypter </param>
         /// <param name="cle"> Clé servant à décoder le message </param>
         /// <returns> Retourne les octets décodé sous une forme de message </returns>
         public static string Decrypter(byte[] message, int size, byte[] cle)
         {
+            // Initiation de variables
             char[] buffer = new char[1024];
             Aes aes = Aes.Create();
             int charRead = 0;
@@ -670,6 +677,7 @@ namespace ExempleMVVM.Modules
             }
             aes.IV = IV;
 
+            // Encryption
             ICryptoTransform decrypteur = aes.CreateDecryptor(aes.Key, aes.IV);
             using (MemoryStream memoryStream = new MemoryStream())
             {
