@@ -250,7 +250,7 @@ namespace ExempleMVVM.Modules
         /// <param name="conversation">Conversation à fermer</param>
         public static void TerminerConversationPrivee(Conversation conversation)
         {
-            Envoyer(conversation, "Q");
+            //Envoyer(conversation, "Q");
 
             conversation.Socket.Shutdown(SocketShutdown.Both);
             conversation.Socket.Close();
