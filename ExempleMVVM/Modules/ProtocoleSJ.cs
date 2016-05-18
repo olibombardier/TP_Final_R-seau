@@ -164,24 +164,28 @@ namespace ExempleMVVM.Modules
             short port = 0;
             string stringCle, stringPort;
 
+            // Création de la clé
             random.NextBytes(cle);
             nouvelleConversation.Key = cle;
 
+            // Ouverture du socket
             Socket socketEcoute = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socketEcoute.Bind(new IPEndPoint(IPAddress.Any, 0));
             socketEcoute.Listen(1);
             port = (short)((IPEndPoint)socketEcoute.LocalEndPoint).Port;
 
+            // Mettre la clé et le port en string
             foreach (byte b in cle)
             {
                 stringBuilderCle.Append(String.Format("{0:x2}", b));
             }
-
             stringCle = stringBuilderCle.ToString();
             stringPort = String.Format("{0:x4}", port);
 
+            // Envois des informations à l'autre utilisateur
             EnvoyerDemendeConversationPrivee(stringCle, stringPort, nouvelleConversation.Utilisateur);
 
+            // Attente de la connection de l'autre utilisateur
             await Task.Factory.StartNew(() =>
                 {
                     nouvelleConversation.Socket = socketEcoute.Accept();
@@ -189,6 +193,7 @@ namespace ExempleMVVM.Modules
                 });
             socketEcoute.Close();
 
+            // Commence à écouter l'autre utilisateur
             Recevoir(nouvelleConversation);
         }
 
@@ -212,10 +217,12 @@ namespace ExempleMVVM.Modules
         {
             while (profilApplication.Connecte)
             {
+                // Envoit un discovery
                 EnvoyerDiscovery();
                 await Task.Delay(5000);
                 List<Utilisateur> listeASupprimer = new List<Utilisateur>();
 
+                // Trouver les utilisateurs qui se sont ajouté ou sont partis
                 foreach (Utilisateur vieuxUtilisateur in profilApplication.UtilisateursConnectes)
                 {
                     Utilisateur utilisateur = utilisateurTemp.Find((u) =>
@@ -230,11 +237,13 @@ namespace ExempleMVVM.Modules
                     }
                 }
 
+                // Supprimme les utilisateurs ayant quittés
                 foreach (Utilisateur utilisateurASupprimer in listeASupprimer)
                 {
                     profilApplication.UtilisateursConnectes.Remove(utilisateurASupprimer);
                 }
 
+                // Ajoute les nouveaux utilisateurs
                 foreach (Utilisateur utilisateurAAjouter in utilisateurTemp)
                 {
                     profilApplication.UtilisateursConnectes.Add(utilisateurAAjouter);
@@ -250,7 +259,7 @@ namespace ExempleMVVM.Modules
         /// <param name="conversation">Conversation à fermer</param>
         public static void TerminerConversationPrivee(Conversation conversation)
         {
-            //Envoyer(conversation, "Q");
+            Envoyer(conversation, "Q");
 
             conversation.Socket.Shutdown(SocketShutdown.Both);
             conversation.Socket.Close();
